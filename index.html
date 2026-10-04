@@ -562,7 +562,71 @@ body.helperTheme #page1 .sig{justify-content:space-between}
 
 <script>
 // নিচের URL-টি Code.gs ডিপ্লয় করার পর পাওয়া নতুন Web App URL দিয়ে বদলে দিতে হবে
+const APP_VERSION="3.13";
 const SHEET_URL="https://script.google.com/macros/s/AKfycbxIggc9iT9nZBkfFIXi8nvTOWc92To8Y7aQcEdm2cxNGdcewxTTr9-5oZ4eQ99ABAk2/exec";
+
+// ===== পাসওয়ার্ড সুরক্ষা (v3.13) =====
+// পাসওয়ার্ড প্রতিটি সার্ভার-অনুরোধের সাথে যায়; ব্রাউজারে একবার সেভ থাকে (আবার লাগে না)
+const _origFetch=window.fetch.bind(window);
+function getFormKey(){try{return localStorage.getItem("ucilFormKey")||""}catch(e){return ""}}
+window.fetch=function(u,o){
+  if(typeof u==="string"&&u.indexOf(SHEET_URL)===0){
+    const k=getFormKey();
+    if(!o||!o.method||String(o.method).toUpperCase()==="GET"){
+      u+=(u.indexOf("?")>-1?"&":"?")+"key="+encodeURIComponent(k);
+    }else if(o.body){
+      try{const b=JSON.parse(o.body);b.key=k;o=Object.assign({},o,{body:JSON.stringify(b)})}catch(e){}
+    }
+    return _origFetch(u,o).then(function(r){
+      try{r.clone().json().then(function(j){if(j&&j.code==="AUTH")showLogin(j.message)}).catch(function(){})}catch(e){}
+      return r;
+    });
+  }
+  return _origFetch(u,o);
+};
+function showLogin(msg){
+  let ov=document.getElementById("loginOverlay");
+  if(!ov){
+    ov=document.createElement("div");ov.id="loginOverlay";
+    ov.style.cssText="position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:100000;display:flex;align-items:center;justify-content:center;font-family:Arial,sans-serif";
+    ov.innerHTML='<div style="background:#fff;border-radius:10px;padding:22px 26px;width:320px;box-shadow:0 8px 30px #0006;text-align:center"><div style="font-weight:bold;font-size:15px;margin-bottom:4px">UCIL Transport Division</div><div style="font-size:12px;color:#555;margin-bottom:12px">ফর্ম ব্যবহার করতে পাসওয়ার্ড দিন</div><input id="loginKey" type="password" placeholder="পাসওয়ার্ড" style="width:100%;box-sizing:border-box;padding:9px;font-size:14px;border:1px solid #999;border-radius:5px"><div id="loginMsg" style="color:#c0392b;font-size:12px;min-height:16px;margin:8px 0"></div><button id="loginBtn" style="background:#b02a37;color:#fff;border:0;border-radius:5px;padding:9px 26px;font-weight:bold;cursor:pointer">প্রবেশ করুন</button></div>';
+    document.body.appendChild(ov);
+    const go=async function(){
+      const v=document.getElementById("loginKey").value;
+      if(!v){document.getElementById("loginMsg").textContent="পাসওয়ার্ড লিখুন";return}
+      const btn=document.getElementById("loginBtn");btn.disabled=true;btn.textContent="যাচাই হচ্ছে...";
+      try{
+        const r=await _origFetch(SHEET_URL+"?key="+encodeURIComponent(v));
+        const j=await r.json();
+        if(j&&j.result==="success"){try{localStorage.setItem("ucilFormKey",v)}catch(e){}location.reload();return}
+        document.getElementById("loginMsg").textContent=(j&&j.message)||"পাসওয়ার্ড ভুল";
+      }catch(e){document.getElementById("loginMsg").textContent="সার্ভারে সংযোগ করা যায়নি"}
+      btn.disabled=false;btn.textContent="প্রবেশ করুন";
+    };
+    document.getElementById("loginBtn").onclick=go;
+    document.getElementById("loginKey").addEventListener("keydown",function(e){if(e.key==="Enter")go()});
+  }
+  if(msg)document.getElementById("loginMsg").textContent=msg;
+  try{localStorage.removeItem("ucilFormKey")}catch(e){}
+  setTimeout(function(){const k=document.getElementById("loginKey");if(k)k.focus()},50);
+}
+
+// ===== নতুন ভার্সনের বার্তা (v3.13) — হোস্ট করা পেজে চলে, ফাইল থেকে খুললে বন্ধ =====
+function checkForUpdate(){
+  if(location.protocol!=="https:"&&location.protocol!=="http:")return;
+  _origFetch(location.origin+location.pathname+"?_="+Date.now(),{cache:"no-store"}).then(function(r){return r.text()}).then(function(t){
+    const m=t.match(/const APP_VERSION="([^"]+)"/);
+    if(m&&m[1]!==APP_VERSION&&!document.getElementById("updBanner")){
+      const b=document.createElement("div");b.id="updBanner";
+      b.style.cssText="position:fixed;top:0;left:0;right:0;background:#0b6b2e;color:#fff;text-align:center;padding:9px;font:bold 13px Arial;z-index:100001";
+      b.innerHTML='🔄 ফর্মের নতুন আপডেট এসেছে — <button onclick="location.reload()" style="margin-left:8px;padding:3px 12px;border:0;border-radius:4px;font-weight:bold;cursor:pointer">রিফ্রেশ করুন</button>';
+      document.body.appendChild(b);
+    }
+  }).catch(function(){});
+}
+setInterval(checkForUpdate,180000);
+document.addEventListener("visibilitychange",function(){if(!document.hidden)checkForUpdate()});
+window.addEventListener("load",function(){setTimeout(checkForUpdate,4000)});
 const DES=["Driver","Helper"];
 const DRIVER_SUB=["Truck Driver","Bulk Driver","Ghat Driver","Loading Driver"];
 const HELPER_SUB=["Truck Helper","Bulk Helper","Ghat Helper"];
@@ -1248,5 +1312,9 @@ function parseDateStr(str){
   return null;
 }
 function handleTypedDate(inp,cb){const val=inp.value.trim();if(!val){delete inp.dataset.iso;if(cb)cb();return}const p=parseDateStr(val);if(p){inp.value=fmtDate(new Date(p.y,p.m,p.d));inp.dataset.iso=p.y+"-"+pad(p.m+1)+"-"+pad(p.d)}else{delete inp.dataset.iso}if(cb)cb()}
-window.onload=function(){init();showFillDate();updateRequiredMarks()};
+window.onload=function(){
+  init();showFillDate();updateRequiredMarks();
+  // শুরুতেই পাসওয়ার্ড যাচাই: না থাকলে চাওয়া হয়; থাকলে সার্ভারে মিলিয়ে দেখা হয় (পাসওয়ার্ড বদলানো হলে আবার চাইবে)
+  if(!getFormKey())showLogin();else fetch(SHEET_URL).catch(function(){});
+};
 </script></body></html>
