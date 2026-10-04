@@ -310,7 +310,7 @@ body.helperTheme #page1 .sig{justify-content:space-between}
 <div class="g4" style="margin-bottom:3px"><div class="f"><label>Father Name</label><input id="fatherName"></div><div class="f"><label>Father's Mobile Number</label><input id="fatherMobile" type="tel" maxlength="12" inputmode="numeric" oninput="formatMobile(this)"></div><div class="f"><label>Mother Name</label><input id="motherName"></div><div class="f"><label>Mother's Mobile Number</label><input id="motherMobile" type="tel" maxlength="12" inputmode="numeric" oninput="formatMobile(this)"></div></div>
 <div class="g4" style="margin-bottom:3px"><div class="f"><label>Village</label><input id="village"></div><div class="f"><label>Post Office</label><input id="postOffice"></div><div class="f"><label>Thana</label><select id="thana"><option value="">Select Thana</option></select></div><div class="f"><label>District</label><select id="district" onchange="thanas()"></select></div></div>
 <div class="g4" style="margin-bottom:3px"><div class="f"><label>NID No. / Birth Certificate No.</label><input id="nidNumber"></div><div class="f"><label>Birth Date</label><div class="dwrap"><input id="birthDate" placeholder="dd-mmmm-yyyy"><button type="button" class="dbtn" onclick="pickDate('birthDate',age)">&#128197;</button></div></div><div class="splitCell"><div class="f"><label>Age</label><input id="age" class="ro" readonly></div><div class="f"><label>Blood Group</label><select id="bloodGroup"><option value="">Select</option><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>AB+</option><option>AB-</option><option>O+</option><option>O-</option></select></div></div><div class="f"><label>Religion</label><select id="religion"><option value="">Select Religion</option><option>Islam</option><option>Hinduism</option><option>Christianity</option><option>Buddhism</option><option>Other</option></select></div></div>
-<div class="g4"><div class="f"><label>Marital Status</label><select id="maritalStatus"><option value="">Select Status</option><option>Married</option><option>Unmarried</option></select></div><div class="f"><label>Education</label><select id="education"><option value="">Select Education</option><option>Class 5</option><option>JSC</option><option>SSC</option><option>HSC</option><option>Degree</option><option>Others</option></select></div><div class="f"><label>Which Company were you in?</label><input id="previousCompany"></div><div class="f"><label>Experience Year</label><input id="experienceYear" type="number" min="0" placeholder="Years"></div></div>
+<div class="g4"><div class="f"><label>Marital Status</label><select id="maritalStatus"><option value="">Select Status</option><option>Married</option><option>Unmarried</option></select></div><div class="f"><label>Education</label><select id="education"><option value="">Select Education</option><option>JSC</option><option>SSC</option><option>HSC</option><option>Degree</option><option>Others</option></select></div><div class="f"><label>Which Company were you in?</label><input id="previousCompany"></div><div class="f"><label>Experience Year</label><input id="experienceYear" type="number" min="0" placeholder="Years"></div></div>
 </div></div>
 
 <div class="sec"><div class="st">3. Licence &amp; bKash Information</div><div class="ct"><div class="gbk"><div class="f" id="licenceNoBox"><label>Licence No.</label><input id="licenceNo"></div><div class="f" id="licenceValidityBox" style="flex:0 1 155px"><label>Licence Validity Till</label><div class="dwrap"><input id="licenceValidity" placeholder="dd-mmmm-yyyy"><button type="button" class="dbtn" onclick="pickDate('licenceValidity',licenceDaysCalc)">&#128197;</button></div></div><div class="f" id="licenceDaysBox" style="display:none;flex:1 1 170px"><label>Validity Left</label><input id="licenceDaysLeft" class="ro" readonly></div><div class="f" id="dlTypeBox" style="display:none"><label>DL Type</label><select id="dlType"><option value="">Select</option><option>Heavy</option><option>Medium</option><option>Light</option></select></div><div class="f" id="bkashNoBox"><label>bKash No.</label><input id="bkashNo" type="tel" maxlength="12" inputmode="numeric" oninput="formatMobile(this)"></div><div class="f small" id="bkashOwnerBox"><label>bKash Owner</label><select id="bkashOwner"><option value="">Select</option><option>Own</option><option>Father</option><option>Mother</option><option>Wife</option><option>Others</option></select></div><div class="f" id="joiningDateBox" style="display:none"><label>Joining Date</label><div class="dwrap"><input id="joiningDate" placeholder="dd-mmmm-yyyy"><button type="button" class="dbtn" onclick="pickDate('joiningDate',null)">&#128197;</button></div></div><div class="f" id="grossSalaryBox" style="display:none"><label>Gross Salary</label><input id="grossSalary" type="number"></div></div><div class="salaryNote" id="helperSalaryNote" style="display:none">Helper Salary is 5200tk per months and 60 tk per day Other allowance.</div></div></div>
@@ -562,7 +562,7 @@ body.helperTheme #page1 .sig{justify-content:space-between}
 
 <script>
 // নিচের URL-টি Code.gs ডিপ্লয় করার পর পাওয়া নতুন Web App URL দিয়ে বদলে দিতে হবে
-const APP_VERSION="3.14";
+const APP_VERSION="3.16";
 const SHEET_URL="https://script.google.com/macros/s/AKfycbxIggc9iT9nZBkfFIXi8nvTOWc92To8Y7aQcEdm2cxNGdcewxTTr9-5oZ4eQ99ABAk2/exec";
 
 // ===== পাসওয়ার্ড সুরক্ষা (v3.13) =====
@@ -803,9 +803,9 @@ function syncPages(){
   setCell("dpRef2Name",g("referenceName2"));
   setCell("dpRef2Addr",refAddr(2));
   setCell("dpRef2Mobile",g("referenceMobile2"));
-  // পাতা ৪: Date of Joining — শুধু ফাঁকা থাকলে আজকের তারিখ বসবে, এডিট করলে আর বদলাবে না
-  const djd=document.getElementById("dpJoinDate");
-  if(djd&&!djd.value)djd.value=fmtDate(new Date());
+  // পাতা ৪: Date of Joining — পাতা ৩-এর যোগদানের তারিখ বসালে সেটাই আসে; পাতা ৩-এ না বসালে ফাঁকা থাকে (আজকের তারিখ আর অটো বসে না)। পাতা ৪-এ নিজে লিখলে আর বদলায় না।
+  const djd=document.getElementById("dpJoinDate"),ltj=document.getElementById("ltJoinDate");
+  if(djd&&!djd.dataset.manual)djd.value=ltj?ltj.value.trim():"";
   // পাতা ৫: Driving Training Form ও Safety Induction Form — ১ম পাতার ডাটা থেকে অটো-ফিল
   setT("trName",name);
   setT("trDate",fmtDate(new Date()));
@@ -1020,7 +1020,7 @@ async function lookupReference(n){
 }
 async function nextTempFromSheet(){
   try{
-    const res=await fetch(SHEET_URL,{method:"GET"});
+    const res=await fetch(SHEET_URL+"?need=temp");
     const txt=await res.text();
     let j=null;try{j=JSON.parse(txt)}catch(pe){console.error("nextTempFromSheet: non-JSON response from SHEET_URL — আপনি সম্ভবত পুরনো ডিপ্লয়মেন্টে আছেন বা লগইন পেজ ফেরত আসছে।",txt);toast("⚠️ Temp code সার্ভার থেকে আনা যায়নি (পুরনো ডিপ্লয়মেন্ট?)","warn");return "DT-100"}
     if(j&&j.result==="success"&&j.nextTemp)return String(j.nextTemp);
@@ -1047,7 +1047,7 @@ async function updateCodeLogic(){
 }
 async function nextHelperCodeFromSheet(){
   try{
-    const res=await fetch(SHEET_URL,{method:"GET"});
+    const res=await fetch(SHEET_URL+"?need=helper");
     const txt=await res.text();
     let j=null;try{j=JSON.parse(txt)}catch(pe){console.error("nextHelperCodeFromSheet: non-JSON response",txt);toast("⚠️ Helper code সার্ভার থেকে আনা যায়নি (পুরনো ডিপ্লয়মেন্ট?)","warn");return localNextCode(HELPER_PREFIX,4)}
     if(j&&j.result==="success"&&j.nextHelperCode)return String(j.nextHelperCode);
@@ -1057,7 +1057,7 @@ async function nextHelperCodeFromSheet(){
 }
 async function nextDriverCodeFromSheet(){
   try{
-    const res=await fetch(SHEET_URL,{method:"GET"});
+    const res=await fetch(SHEET_URL+"?need=driver");
     const txt=await res.text();
     let j=null;try{j=JSON.parse(txt)}catch(pe){console.error("nextDriverCodeFromSheet: non-JSON response",txt);toast("⚠️ Driver code সার্ভার থেকে আনা যায়নি (পুরনো ডিপ্লয়মেন্ট?)","warn");return localNextCode(DRIVER_PREFIX,4)}
     if(j&&j.result==="success"&&j.nextDriverCode)return String(j.nextDriverCode);
@@ -1066,7 +1066,8 @@ async function nextDriverCodeFromSheet(){
   return localNextCode(DRIVER_PREFIX,4);
 }
 function localNextCode(prefix,pad){let m=0;const re=new RegExp("^"+prefix+"(\\d+)$");for(let i=0;i<localStorage.length;i++){let k=localStorage.key(i),mm=k.match(re);if(mm)m=Math.max(m,+mm[1])}return buildCode(prefix,m+1,pad)}
-async function resetForm(){ids.forEach(i=>{let el=document.getElementById(i);if(i!="codeNo"){el.value="";if(el.dataset)delete el.dataset.iso}});const ltGhatEl0=document.getElementById("ltGhatName");if(ltGhatEl0)ltGhatEl0.value="";const ltBkashOwnerEl0=document.getElementById("ltBkashOwner");if(ltBkashOwnerEl0)ltBkashOwnerEl0.value="";thanas();fill("referenceDistrict1",Object.keys(D).sort(),"Select District");fill("referenceThana1",[],"Select Thana");fill("referenceDistrict2",Object.keys(D).sort(),"Select District");fill("referenceThana2",[],"Select Thana");fill("subDesignation",[],"Select Sub Designation");document.getElementById("ghatNameBox").style.display="none";updateDriverCategoryOptions();updateGhatVisibility();updateGrossSalary();updateVehicleVisibility();updateLicenceVisibility();updateReferenceVisibility();updateOfficeSection();updateDeclaration();refreshAllSelects();const pb=document.getElementById("photoBox");if(pb){pb.innerHTML="Passport Size Photo";delete pb.dataset.img}updatePageVisibility();setMode(null);await updateCodeLogic();document.querySelectorAll(".err").forEach(e=>e.classList.remove("err"))}
+document.addEventListener("input",function(e){if(e.target&&e.target.id==="dpJoinDate")e.target.dataset.manual="1"});
+async function resetForm(){document.querySelectorAll("[contenteditable]").forEach(e=>{e.textContent=""});ids.forEach(i=>{let el=document.getElementById(i);if(i!="codeNo"){el.value="";if(el.dataset){delete el.dataset.iso;delete el.dataset.manual}}});const ltGhatEl0=document.getElementById("ltGhatName");if(ltGhatEl0)ltGhatEl0.value="";const ltBkashOwnerEl0=document.getElementById("ltBkashOwner");if(ltBkashOwnerEl0)ltBkashOwnerEl0.value="";thanas();fill("referenceDistrict1",Object.keys(D).sort(),"Select District");fill("referenceThana1",[],"Select Thana");fill("referenceDistrict2",Object.keys(D).sort(),"Select District");fill("referenceThana2",[],"Select Thana");fill("subDesignation",[],"Select Sub Designation");document.getElementById("ghatNameBox").style.display="none";updateDriverCategoryOptions();updateGhatVisibility();updateGrossSalary();updateVehicleVisibility();updateLicenceVisibility();updateReferenceVisibility();updateOfficeSection();updateDeclaration();refreshAllSelects();const pb=document.getElementById("photoBox");if(pb){pb.innerHTML="Passport Size Photo";delete pb.dataset.img}updatePageVisibility();setMode(null);await updateCodeLogic();document.querySelectorAll(".err").forEach(e=>e.classList.remove("err"))}
 async function search(){
   const raw=prompt("Code No. লিখুন (স্থায়ী CD-/CH- কোড অথবা DT- অস্থায়ী কোড)");
   if(!raw)return;
@@ -1080,7 +1081,7 @@ async function search(){
       localStorage[c]=JSON.stringify(j.data);
       if(j.isTemp){
         const tcode=j.tempCode||c;
-        const newCode=await nextDriverCodeFromSheet();
+        const newCode=j.nextDriverCode||await nextDriverCodeFromSheet();   // সার্ভার সার্চের সাথেই পরের CD কোড পাঠায় (আলাদা অনুরোধ লাগে না)
         setConvertMode(tcode,newCode);
         toast("✅ Temp তথ্য লোড হয়েছে — স্থায়ী কোড প্রস্তাবিত: "+newCode);
       }else{
