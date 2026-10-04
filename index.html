@@ -562,13 +562,13 @@ body.helperTheme #page1 .sig{justify-content:space-between}
 
 <script>
 // নিচের URL-টি Code.gs ডিপ্লয় করার পর পাওয়া নতুন Web App URL দিয়ে বদলে দিতে হবে
-const APP_VERSION="3.13";
+const APP_VERSION="3.14";
 const SHEET_URL="https://script.google.com/macros/s/AKfycbxIggc9iT9nZBkfFIXi8nvTOWc92To8Y7aQcEdm2cxNGdcewxTTr9-5oZ4eQ99ABAk2/exec";
 
 // ===== পাসওয়ার্ড সুরক্ষা (v3.13) =====
-// পাসওয়ার্ড প্রতিটি সার্ভার-অনুরোধের সাথে যায়; ব্রাউজারে একবার সেভ থাকে (আবার লাগে না)
+// পাসওয়ার্ড প্রতিটি সার্ভার-অনুরোধের সাথে যায়; শুধু এই ট্যাব/ব্রাউজার সেশনে মনে থাকে (ব্রাউজার বন্ধ করলে মুছে যায়, আবার চাইবে)
 const _origFetch=window.fetch.bind(window);
-function getFormKey(){try{return localStorage.getItem("ucilFormKey")||""}catch(e){return ""}}
+function getFormKey(){try{return sessionStorage.getItem("ucilFormKey")||""}catch(e){return ""}}
 window.fetch=function(u,o){
   if(typeof u==="string"&&u.indexOf(SHEET_URL)===0){
     const k=getFormKey();
@@ -598,7 +598,7 @@ function showLogin(msg){
       try{
         const r=await _origFetch(SHEET_URL+"?key="+encodeURIComponent(v));
         const j=await r.json();
-        if(j&&j.result==="success"){try{localStorage.setItem("ucilFormKey",v)}catch(e){}location.reload();return}
+        if(j&&j.result==="success"){try{sessionStorage.setItem("ucilFormKey",v)}catch(e){}location.reload();return}
         document.getElementById("loginMsg").textContent=(j&&j.message)||"পাসওয়ার্ড ভুল";
       }catch(e){document.getElementById("loginMsg").textContent="সার্ভারে সংযোগ করা যায়নি"}
       btn.disabled=false;btn.textContent="প্রবেশ করুন";
@@ -607,7 +607,7 @@ function showLogin(msg){
     document.getElementById("loginKey").addEventListener("keydown",function(e){if(e.key==="Enter")go()});
   }
   if(msg)document.getElementById("loginMsg").textContent=msg;
-  try{localStorage.removeItem("ucilFormKey")}catch(e){}
+  try{sessionStorage.removeItem("ucilFormKey")}catch(e){}
   setTimeout(function(){const k=document.getElementById("loginKey");if(k)k.focus()},50);
 }
 
