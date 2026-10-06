@@ -253,7 +253,13 @@ body.helperTheme #hseSig{display:block}
 body.helperTheme #page1 .sig{justify-content:space-between}
 .head-mid{align-self:stretch;display:flex;flex-direction:column;align-items:center}
 .head-mid .idmini{display:flex;flex-wrap:nowrap;max-width:none;justify-content:center;align-items:flex-end;gap:8px;margin-top:auto;padding-top:4px}
+.apRow3{gap:14px}
+.apRow3 .itm{flex:1 1 0;min-width:0}
+.apRow3 .apLine{min-width:0 !important}
+#tempDriverCategory{min-width:60px !important;cursor:pointer}
+#tempDriverCategory.err{border-bottom:2px solid #d00000 !important;background:#fff0f0}
 @media print{
+  #tempDriverCategory{background-image:none !important;-webkit-appearance:none;appearance:none}
   html,body{background:#fff}
   .bar,#toast{display:none}
   .page{margin:0;box-shadow:none;page-break-after:always}
@@ -353,8 +359,9 @@ body.helperTheme #page1 .sig{justify-content:space-between}
     <div class="itm"><span class="lbl">Name:</span><span class="apLine" id="apName"></span></div>
     <div class="itm"><span class="lbl">Position:</span><span class="apLine" id="apPosition"></span></div>
   </div>
-  <div class="apRowLine">
+  <div class="apRowLine apRow3">
     <div class="itm"><span class="lbl">Location:</span><span class="apLine">UCIL (Transport)</span></div>
+    <div class="itm" style="flex:1.15"><span class="lbl">Driver Categories:</span><select class="apLine" id="tempDriverCategory" title="অস্থায়ী (Provisional) ড্রাইভার ক্যাটাগরি — শুধু Temp File-এ সংরক্ষিত হয়"></select></div>
     <div class="itm"><span class="lbl">Report To:</span><input class="apLine" type="text" id="apReportTo"></div>
   </div>
   <div class="apRowLine">
@@ -562,7 +569,7 @@ body.helperTheme #page1 .sig{justify-content:space-between}
 
 <script>
 // নিচের URL-টি Code.gs ডিপ্লয় করার পর পাওয়া নতুন Web App URL দিয়ে বদলে দিতে হবে
-const APP_VERSION="3.16";
+const APP_VERSION="3.18";
 const SHEET_URL="https://script.google.com/macros/s/AKfycbxIggc9iT9nZBkfFIXi8nvTOWc92To8Y7aQcEdm2cxNGdcewxTTr9-5oZ4eQ99ABAk2/exec";
 
 // ===== পাসওয়ার্ড সুরক্ষা (v3.13) =====
@@ -670,10 +677,14 @@ function updateDriverCategoryOptions(){
   const cur=dcEl?dcEl.value:"";
   fill("driverCategory",opts,"Select");
   if(dcEl&&opts.includes(cur))dcEl.value=cur;
+  // ২য় পাতার অস্থায়ী (Provisional) ক্যাটাগরি — একই অপশন তালিকা; এটা কখনো ৩য় পাতার চূড়ান্ত ক্যাটাগরিকে প্রভাবিত করে না
+  const tcEl=document.getElementById("tempDriverCategory");
+  if(tcEl){const tcur=tcEl.value;fill("tempDriverCategory",opts,"\u00a0");if(opts.includes(tcur))tcEl.value=tcur}
   updateDriverPay();
+  if(typeof updateRequiredMarks==="function")updateRequiredMarks();
 }
 const DISTRICT_BN={"Bagerhat": "বাগেরহাট", "Bandarban": "বান্দরবান", "Barguna": "বরগুনা", "Barisal": "বরিশাল", "Bhola": "ভোলা", "Bogura": "বগুড়া", "Brahmanbaria": "ব্রাহ্মণবাড়িয়া", "Chandpur": "চাঁদপুর", "Chapainawabganj": "চাঁপাইনবাবগঞ্জ", "Chittagong": "চট্টগ্রাম", "Chuadanga": "চুয়াডাঙ্গা", "Comilla": "কুমিল্লা", "Cox's Bazar": "কক্সবাজার", "Dhaka": "ঢাকা", "Dinajpur": "দিনাজপুর", "Faridpur": "ফরিদপুর", "Feni": "ফেনী", "Gaibandha": "গাইবান্ধা", "Gazipur": "গাজীপুর", "Gopalganj": "গোপালগঞ্জ", "Habiganj": "হবিগঞ্জ", "Jamalpur": "জামালপুর", "Jessore": "যশোর", "Jhalokati": "ঝালকাঠি", "Jhenaidah": "ঝিনাইদহ", "Joypurhat": "জয়পুরহাট", "Khagrachhari": "খাগড়াছড়ি", "Khulna": "খুলনা", "Kishoreganj": "কিশোরগঞ্জ", "Kurigram": "কুড়িগ্রাম", "Kushtia": "কুষ্টিয়া", "Lakshmipur": "লক্ষ্মীপুর", "Lalmonirhat": "লালমনিরহাট", "Madaripur": "মাদারীপুর", "Magura": "মাগুরা", "Manikganj": "মানিকগঞ্জ", "Meherpur": "মেহেরপুর", "Moulvibazar": "মৌলভীবাজার", "Munshiganj": "মুন্সিগঞ্জ", "Mymensingh": "ময়মনসিংহ", "Naogaon": "নওগাঁ", "Narail": "নড়াইল", "Narayanganj": "নারায়ণগঞ্জ", "Narsingdi": "নরসিংদী", "Natore": "নাটোর", "Netrokona": "নেত্রকোণা", "Nilphamari": "নীলফামারী", "Noakhali": "নোয়াখালী", "Pabna": "পাবনা", "Panchagarh": "পঞ্চগড়", "Patuakhali": "পটুয়াখালী", "Pirojpur": "পিরোজপুর", "Rajbari": "রাজবাড়ী", "Rajshahi": "রাজশাহী", "Rangamati": "রাঙ্গামাটি", "Rangpur": "রংপুর", "Satkhira": "সাতক্ষীরা", "Shariatpur": "শরীয়তপুর", "Sherpur": "শেরপুর", "Sirajganj": "সিরাজগঞ্জ", "Sunamganj": "সুনামগঞ্জ", "Sylhet": "সিলেট", "Tangail": "টাঙ্গাইল", "Thakurgaon": "ঠাকুরগাঁও"};
-const ids=["codeNo","vehicleNo","ghatName","employeeName","designation","mobileNumber","joiningDate","subDesignation","driverCategory","workingLocation","grossSalary","fatherName","motherName","fatherMobile","motherMobile","village","postOffice","thana","district","maritalStatus","birthDate","age","nidNumber","bloodGroup","education","religion","previousCompany","experienceYear","licenceNo","licenceValidity","dlType","bkashNo","bkashOwner","referenceCode1","referenceName1","referenceVillage1","referencePostOffice1","referenceThana1","referenceDistrict1","referenceMobile1","referenceCode2","referenceName2","referenceVillage2","referencePostOffice2","referenceThana2","referenceDistrict2","referenceMobile2","apReportTo","apDuration","apDlType","ltJoinDate","ltBkashNo","dpMonthlySalary","dpDailyAllowance","dpJoinDate"];
+const ids=["codeNo","vehicleNo","ghatName","employeeName","designation","mobileNumber","joiningDate","subDesignation","driverCategory","workingLocation","grossSalary","fatherName","motherName","fatherMobile","motherMobile","village","postOffice","thana","district","maritalStatus","birthDate","age","nidNumber","bloodGroup","education","religion","previousCompany","experienceYear","licenceNo","licenceValidity","dlType","bkashNo","bkashOwner","referenceCode1","referenceName1","referenceVillage1","referencePostOffice1","referenceThana1","referenceDistrict1","referenceMobile1","referenceCode2","referenceName2","referenceVillage2","referencePostOffice2","referenceThana2","referenceDistrict2","referenceMobile2","apReportTo","tempDriverCategory","apDuration","apDlType","ltJoinDate","ltBkashNo","dpMonthlySalary","dpDailyAllowance","dpJoinDate"];
 function pad(n){return n<10?"0"+n:""+n}
 function fmtDate(d){return pad(d.getDate())+"-"+MONTHS[d.getMonth()]+"-"+d.getFullYear()}
 function fill(id,a,p){let e=document.getElementById(id);e.innerHTML=p?'<option value="">'+p+'</option>':'';a.forEach(x=>e.add(new Option(x,x)))}
@@ -981,8 +992,8 @@ document.addEventListener("change",function(e){if(e.target&&e.target.tagName==="
 function formatMobile(el){let v=el.value.replace(/\D/g,"").slice(0,11);el.value=v.length>5?v.slice(0,5)+"-"+v.slice(5):v}
 function age(){let inp=document.getElementById("birthDate"),iso=inp.dataset.iso,out=document.getElementById("age");if(!iso){out.value="";return}let d=new Date(iso+"T00:00:00"),t=new Date(),y=t.getFullYear()-d.getFullYear();if(t.getMonth()<d.getMonth()||(t.getMonth()==d.getMonth()&&t.getDate()<d.getDate()))y--;out.value=y+(y===1?" Year":" Years")}
 function licenceDaysCalc(){let inp=document.getElementById("licenceValidity"),iso=inp&&inp.dataset.iso,out=document.getElementById("licenceDaysLeft");if(!out)return;if(!iso){out.value="";return}let d=new Date(iso+"T00:00:00"),t=new Date();t.setHours(0,0,0,0);if(d<t){out.value="Expired";return}let y=d.getFullYear()-t.getFullYear(),m=d.getMonth()-t.getMonth(),dd=d.getDate()-t.getDate();if(dd<0){m--;dd+=new Date(d.getFullYear(),d.getMonth(),0).getDate()}if(m<0){y--;m+=12}let parts=[];if(y>0)parts.push(y+(y===1?" Year":" Years"));if(m>0)parts.push(m+(m===1?" Month":" Months"));if(dd>0||parts.length===0)parts.push(dd+(dd===1?" Day":" Days"));out.value=parts.join(" ")}
-function data(){updateWorkingLocation();let x={};ids.forEach(i=>{let el=document.getElementById(i);x[i]=el.value;if(el.dataset&&el.dataset.iso)x[i+"_iso"]=el.dataset.iso});if(document.getElementById("designation").value==="Driver"){const lbn=document.getElementById("ltBkashNo"),lbo=document.getElementById("ltBkashOwner");if(lbn)x.bkashNo=lbn.value;if(lbo)x.bkashOwner=lbo.value}return x}
-function set(x){const dateIds=["joiningDate","birthDate","licenceValidity"];ids.forEach(i=>{let el=document.getElementById(i);if(el&&x[i]!==undefined){el.value=x[i];if(x[i+"_iso"]){el.dataset.iso=x[i+"_iso"]}else if(dateIds.includes(i)&&x[i]){const p=parseDateStr(String(x[i]));if(p)el.dataset.iso=p.y+"-"+pad(p.m+1)+"-"+pad(p.d)}}});const ltJoinEl=document.getElementById("ltJoinDate");if(ltJoinEl&&x.joiningDate!==undefined){ltJoinEl.value=x.joiningDate;if(x.joiningDate_iso)ltJoinEl.dataset.iso=x.joiningDate_iso;else delete ltJoinEl.dataset.iso}if(x.district){document.getElementById("district").value=x.district;thanas();document.getElementById("thana").value=x.thana||""}if(x.referenceDistrict1){document.getElementById("referenceDistrict1").value=x.referenceDistrict1;referenceThanas(1);document.getElementById("referenceThana1").value=x.referenceThana1||""}if(x.referenceDistrict2){document.getElementById("referenceDistrict2").value=x.referenceDistrict2;referenceThanas(2);document.getElementById("referenceThana2").value=x.referenceThana2||""}updateSubDesignation();updateGrossSalary();updateVehicleVisibility();updateLicenceVisibility();updateReferenceVisibility();if(x.subDesignation){document.getElementById("subDesignation").value=x.subDesignation;updateGhatVisibility();updateDriverCategoryOptions();if(x.driverCategory){document.getElementById("driverCategory").value=x.driverCategory}if(x.ghatName){document.getElementById("ghatName").value=x.ghatName;const ltGhatEl=document.getElementById("ltGhatName");if(ltGhatEl)ltGhatEl.value=x.ghatName}if(x.workingLocation&&(x.subDesignation==="Ghat Driver"||x.subDesignation==="Ghat Helper")){const ltGhatEl2=document.getElementById("ltGhatName");if(ltGhatEl2)ltGhatEl2.value=x.workingLocation;const ghatEl2=document.getElementById("ghatName");if(ghatEl2)ghatEl2.value=x.workingLocation}}if(x.grossSalary!==undefined)document.getElementById("grossSalary").value=x.grossSalary;if((x.designation||"")==="Driver"){const lbn=document.getElementById("ltBkashNo"),lbo=document.getElementById("ltBkashOwner");if(lbn&&x.bkashNo!==undefined)lbn.value=x.bkashNo;if(lbo&&x.bkashOwner!==undefined)lbo.value=x.bkashOwner}age();licenceDaysCalc();updateOfficeSection();updateDeclaration();refreshAllSelects();updateWorkingLocation();updatePageVisibility()}
+function data(){updateWorkingLocation();let x={};ids.forEach(i=>{let el=document.getElementById(i);x[i]=el.value;if(el.dataset&&el.dataset.iso)x[i+"_iso"]=el.dataset.iso});if(document.getElementById("designation").value==="Driver"){const lbn=document.getElementById("ltBkashNo"),lbo=document.getElementById("ltBkashOwner");if(lbn)x.bkashNo=lbn.value;if(lbo)x.bkashOwner=lbo.value}const fd=document.getElementById("fillDate");x.dataEntryDate=fd?fd.textContent.replace(/^Date:\s*/,"").trim():"";return x}
+function set(x){const dateIds=["joiningDate","birthDate","licenceValidity"];ids.forEach(i=>{let el=document.getElementById(i);if(el&&x[i]!==undefined){el.value=x[i];if(x[i+"_iso"]){el.dataset.iso=x[i+"_iso"]}else if(dateIds.includes(i)&&x[i]){const p=parseDateStr(String(x[i]));if(p)el.dataset.iso=p.y+"-"+pad(p.m+1)+"-"+pad(p.d)}}});const ltJoinEl=document.getElementById("ltJoinDate");if(ltJoinEl&&x.joiningDate!==undefined){ltJoinEl.value=x.joiningDate;if(x.joiningDate_iso)ltJoinEl.dataset.iso=x.joiningDate_iso;else delete ltJoinEl.dataset.iso}if(x.district){document.getElementById("district").value=x.district;thanas();document.getElementById("thana").value=x.thana||""}if(x.referenceDistrict1){document.getElementById("referenceDistrict1").value=x.referenceDistrict1;referenceThanas(1);document.getElementById("referenceThana1").value=x.referenceThana1||""}if(x.referenceDistrict2){document.getElementById("referenceDistrict2").value=x.referenceDistrict2;referenceThanas(2);document.getElementById("referenceThana2").value=x.referenceThana2||""}updateSubDesignation();updateGrossSalary();updateVehicleVisibility();updateLicenceVisibility();updateReferenceVisibility();if(x.subDesignation){document.getElementById("subDesignation").value=x.subDesignation;updateGhatVisibility();updateDriverCategoryOptions();if(x.driverCategory){document.getElementById("driverCategory").value=x.driverCategory}if(x.tempDriverCategory){document.getElementById("tempDriverCategory").value=x.tempDriverCategory}if(x.ghatName){document.getElementById("ghatName").value=x.ghatName;const ltGhatEl=document.getElementById("ltGhatName");if(ltGhatEl)ltGhatEl.value=x.ghatName}if(x.workingLocation&&(x.subDesignation==="Ghat Driver"||x.subDesignation==="Ghat Helper")){const ltGhatEl2=document.getElementById("ltGhatName");if(ltGhatEl2)ltGhatEl2.value=x.workingLocation;const ghatEl2=document.getElementById("ghatName");if(ghatEl2)ghatEl2.value=x.workingLocation}}if(x.grossSalary!==undefined)document.getElementById("grossSalary").value=x.grossSalary;if((x.designation||"")==="Driver"){const lbn=document.getElementById("ltBkashNo"),lbo=document.getElementById("ltBkashOwner");if(lbn&&x.bkashNo!==undefined)lbn.value=x.bkashNo;if(lbo&&x.bkashOwner!==undefined)lbo.value=x.bkashOwner}age();licenceDaysCalc();updateOfficeSection();updateDeclaration();refreshAllSelects();updateWorkingLocation();updatePageVisibility()}
 // এই ৪টি পদবী হলে সরাসরি স্থায়ী কোড (GUARANTOR_DES-এর সাথে একই তালিকা, পুনঃব্যবহার)
 const PERMANENT_DES=GUARANTOR_DES;
 // এই ৬টি পদবী হলে অস্থায়ী DT কোড (FULL_APPROVAL_DES-এর সাথে একই তালিকা, পুনঃব্যবহার)
@@ -1172,21 +1183,31 @@ const REQ_COMMON=[["employeeName","Employee Name"],["designation","Designation"]
 const REQ_OTHER=REQ_COMMON.concat([["birthDate","Birth Date"]]);
 // ড্রাইভার ফর্মের বাধ্যতামূলক ঘর (Birth Date ইত্যাদি বাধ্যতামূলক নয়)
 const REQ_DRIVER=[["employeeName","Employee Name"],["designation","Designation"],["subDesignation","Sub Designation"],["mobileNumber","Mobile Number"],["fatherName","Father Name"],["previousCompany","Which Company were you in?"],["experienceYear","Experience Year"],["dlType","DL Type"]];
-function getReq(){return document.getElementById("designation").value==="Driver"?REQ_DRIVER:REQ_OTHER}
+// ২য় পাতার Driver Categories: নতুন ড্রাইভার এন্ট্রিতে বাধ্যতামূলক, তবে Loading Driver-এর জন্য নয়
+// (Temp থেকে কনভার্ট ও স্থায়ী CD এডিটে এই অস্থায়ী ক্যাটাগরি সেভ হয় না, তাই সেখানে বাধ্যতামূলক নয়)
+const REQ_TEMP_CAT=["tempDriverCategory","Driver Categories"];
+function getReq(){
+  if(document.getElementById("designation").value!=="Driver")return REQ_OTHER;
+  const sub=(document.getElementById("subDesignation")||{}).value||"";
+  const needTempCat=(sub!=="Loading Driver")&&!editMode&&!convertMode;
+  return needTempCat?REQ_DRIVER.concat([REQ_TEMP_CAT]):REQ_DRIVER;
+}
 // বাধ্যতামূলক ঘরের লেবেলের পাশে লাল * বসায় (Designation বদলালে আবার হিসাব হয়)
 function updateRequiredMarks(){
   const reqIds=getReq().map(r=>r[0]);
-  const all=REQ_DRIVER.concat(REQ_OTHER).map(r=>r[0]);
+  const all=REQ_DRIVER.concat(REQ_OTHER).concat([REQ_TEMP_CAT]).map(r=>r[0]);
   [...new Set(all)].forEach(id=>{
     const el=document.getElementById(id);if(!el)return;
-    const f=el.closest(".f");const lb=f&&f.querySelector("label");if(!lb)return;
+    const f=el.closest(".f");let lb=f&&f.querySelector("label");
+    if(!lb){const it=el.closest(".itm");lb=it&&it.querySelector(".lbl")}
+    if(!lb)return;
     const old=lb.querySelector(".rq");if(old)old.remove();
     if(reqIds.includes(id)){const sp=document.createElement("span");sp.className="rq";sp.textContent="*";lb.appendChild(sp)}
   });
 }
 function validateForm(){
   let miss=[],first=null;
-  [...new Set(REQ_DRIVER.concat(REQ_OTHER).map(r=>r[0]))].forEach(id=>{const e0=document.getElementById(id);if(e0)e0.classList.remove("err")});
+  [...new Set(REQ_DRIVER.concat(REQ_OTHER).concat([REQ_TEMP_CAT]).map(r=>r[0]))].forEach(id=>{const e0=document.getElementById(id);if(e0)e0.classList.remove("err")});
   getReq().forEach(r=>{let el=document.getElementById(r[0]);el.classList.remove("err");if(!String(el.value||"").trim()){miss.push(r[1]);el.classList.add("err");if(!first)first=el}});
   const mEl=document.getElementById("mobileNumber"),mob=mEl.value.replace(/\D/g,"");
   if(mob&&mob.length<11){miss.push("সঠিক Mobile Number");mEl.classList.add("err");if(!first)first=mEl}
