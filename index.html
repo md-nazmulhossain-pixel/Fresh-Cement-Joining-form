@@ -491,13 +491,13 @@ body.helperTheme #page1 .sig{justify-content:space-between}
 <div class="dpSecHead">OTHER MEANS OF CONTACT (FAMILY MEMBER)</div>
 <table class="dpTable"><colgroup><col class="c1"><col class="c2"><col class="c3"><col class="c4"><col class="c5"><col class="c6"></colgroup>
   <thead><tr><th style="width:8%">Sl. No</th><th>Name of Family Member</th><th>Address</th><th>Mobile No</th><th>Relation</th><th>Remarks</th></tr></thead>
-  <tbody><tr><td>1</td><td class="dpBlank" contenteditable="true"></td><td class="dpBlank" contenteditable="true"></td><td class="dpBlank" contenteditable="true"></td><td class="dpBlank" contenteditable="true"></td><td class="dpBlank" contenteditable="true"></td></tr><tr><td>2</td><td class="dpBlank" contenteditable="true"></td><td class="dpBlank" contenteditable="true"></td><td class="dpBlank" contenteditable="true"></td><td class="dpBlank" contenteditable="true"></td><td class="dpBlank" contenteditable="true"></td></tr><tr><td>3</td><td class="dpBlank" contenteditable="true"></td><td class="dpBlank" contenteditable="true"></td><td class="dpBlank" contenteditable="true"></td><td class="dpBlank" contenteditable="true"></td><td class="dpBlank" contenteditable="true"></td></tr></tbody>
+  <tbody><tr><td>1</td><td class="dpBlank" contenteditable="true" id="fm1Name"></td><td class="dpBlank" contenteditable="true" id="fm1Addr"></td><td class="dpBlank" contenteditable="true" id="fm1Mobile"></td><td class="dpBlank" contenteditable="true" id="fm1Rel"></td><td class="dpBlank" contenteditable="true"></td></tr><tr><td>2</td><td class="dpBlank" contenteditable="true" id="fm2Name"></td><td class="dpBlank" contenteditable="true" id="fm2Addr"></td><td class="dpBlank" contenteditable="true" id="fm2Mobile"></td><td class="dpBlank" contenteditable="true" id="fm2Rel"></td><td class="dpBlank" contenteditable="true"></td></tr><tr><td>3</td><td class="dpBlank" contenteditable="true" id="fm3Name"></td><td class="dpBlank" contenteditable="true" id="fm3Addr"></td><td class="dpBlank" contenteditable="true" id="fm3Mobile"></td><td class="dpBlank" contenteditable="true" id="fm3Rel"></td><td class="dpBlank" contenteditable="true"></td></tr></tbody>
 </table>
 
 <div class="dpSecHead">NAME &amp; NUMBER OF NEIGHBOUR / RELATIVE / FRIEND</div>
 <table class="dpTable"><colgroup><col class="c1"><col class="c2"><col class="c3"><col class="c4"><col class="c5"><col class="c6"></colgroup>
   <thead><tr><th style="width:8%">Sl. No</th><th>Name</th><th>Address</th><th>Mobile No</th><th>Relation</th><th>Remarks</th></tr></thead>
-  <tbody><tr><td>1</td><td class="dpBlank" contenteditable="true"></td><td class="dpBlank" contenteditable="true"></td><td class="dpBlank" contenteditable="true"></td><td class="dpBlank" contenteditable="true"></td><td class="dpBlank" contenteditable="true"></td></tr><tr><td>2</td><td class="dpBlank" contenteditable="true"></td><td class="dpBlank" contenteditable="true"></td><td class="dpBlank" contenteditable="true"></td><td class="dpBlank" contenteditable="true"></td><td class="dpBlank" contenteditable="true"></td></tr><tr><td>3</td><td class="dpBlank" contenteditable="true"></td><td class="dpBlank" contenteditable="true"></td><td class="dpBlank" contenteditable="true"></td><td class="dpBlank" contenteditable="true"></td><td class="dpBlank" contenteditable="true"></td></tr></tbody>
+  <tbody><tr><td>1</td><td class="dpBlank" contenteditable="true" id="rf1Name"></td><td class="dpBlank" contenteditable="true" id="rf1Addr"></td><td class="dpBlank" contenteditable="true" id="rf1Mobile"></td><td class="dpBlank" contenteditable="true" id="rf1Rel"></td><td class="dpBlank" contenteditable="true"></td></tr><tr><td>2</td><td class="dpBlank" contenteditable="true" id="rf2Name"></td><td class="dpBlank" contenteditable="true" id="rf2Addr"></td><td class="dpBlank" contenteditable="true" id="rf2Mobile"></td><td class="dpBlank" contenteditable="true" id="rf2Rel"></td><td class="dpBlank" contenteditable="true"></td></tr><tr><td>3</td><td class="dpBlank" contenteditable="true" id="rf3Name"></td><td class="dpBlank" contenteditable="true" id="rf3Addr"></td><td class="dpBlank" contenteditable="true" id="rf3Mobile"></td><td class="dpBlank" contenteditable="true" id="rf3Rel"></td><td class="dpBlank" contenteditable="true"></td></tr></tbody>
 </table>
 
 <div class="dpSecHead">NAME &amp; MOBILE NO. OF REFERRING GOVT. EMPLOYEE / CHAIRMAN / MEMBER</div>
@@ -569,7 +569,7 @@ body.helperTheme #page1 .sig{justify-content:space-between}
 
 <script>
 // নিচের URL-টি Code.gs ডিপ্লয় করার পর পাওয়া নতুন Web App URL দিয়ে বদলে দিতে হবে
-const APP_VERSION="3.18";
+const APP_VERSION="3.19";
 const SHEET_URL="https://script.google.com/macros/s/AKfycbxIggc9iT9nZBkfFIXi8nvTOWc92To8Y7aQcEdm2cxNGdcewxTTr9-5oZ4eQ99ABAk2/exec";
 
 // ===== পাসওয়ার্ড সুরক্ষা (v3.13) =====
@@ -992,8 +992,13 @@ document.addEventListener("change",function(e){if(e.target&&e.target.tagName==="
 function formatMobile(el){let v=el.value.replace(/\D/g,"").slice(0,11);el.value=v.length>5?v.slice(0,5)+"-"+v.slice(5):v}
 function age(){let inp=document.getElementById("birthDate"),iso=inp.dataset.iso,out=document.getElementById("age");if(!iso){out.value="";return}let d=new Date(iso+"T00:00:00"),t=new Date(),y=t.getFullYear()-d.getFullYear();if(t.getMonth()<d.getMonth()||(t.getMonth()==d.getMonth()&&t.getDate()<d.getDate()))y--;out.value=y+(y===1?" Year":" Years")}
 function licenceDaysCalc(){let inp=document.getElementById("licenceValidity"),iso=inp&&inp.dataset.iso,out=document.getElementById("licenceDaysLeft");if(!out)return;if(!iso){out.value="";return}let d=new Date(iso+"T00:00:00"),t=new Date();t.setHours(0,0,0,0);if(d<t){out.value="Expired";return}let y=d.getFullYear()-t.getFullYear(),m=d.getMonth()-t.getMonth(),dd=d.getDate()-t.getDate();if(dd<0){m--;dd+=new Date(d.getFullYear(),d.getMonth(),0).getDate()}if(m<0){y--;m+=12}let parts=[];if(y>0)parts.push(y+(y===1?" Year":" Years"));if(m>0)parts.push(m+(m===1?" Month":" Months"));if(dd>0||parts.length===0)parts.push(dd+(dd===1?" Day":" Days"));out.value=parts.join(" ")}
-function data(){updateWorkingLocation();let x={};ids.forEach(i=>{let el=document.getElementById(i);x[i]=el.value;if(el.dataset&&el.dataset.iso)x[i+"_iso"]=el.dataset.iso});if(document.getElementById("designation").value==="Driver"){const lbn=document.getElementById("ltBkashNo"),lbo=document.getElementById("ltBkashOwner");if(lbn)x.bkashNo=lbn.value;if(lbo)x.bkashOwner=lbo.value}const fd=document.getElementById("fillDate");x.dataEntryDate=fd?fd.textContent.replace(/^Date:\s*/,"").trim():"";return x}
-function set(x){const dateIds=["joiningDate","birthDate","licenceValidity"];ids.forEach(i=>{let el=document.getElementById(i);if(el&&x[i]!==undefined){el.value=x[i];if(x[i+"_iso"]){el.dataset.iso=x[i+"_iso"]}else if(dateIds.includes(i)&&x[i]){const p=parseDateStr(String(x[i]));if(p)el.dataset.iso=p.y+"-"+pad(p.m+1)+"-"+pad(p.d)}}});const ltJoinEl=document.getElementById("ltJoinDate");if(ltJoinEl&&x.joiningDate!==undefined){ltJoinEl.value=x.joiningDate;if(x.joiningDate_iso)ltJoinEl.dataset.iso=x.joiningDate_iso;else delete ltJoinEl.dataset.iso}if(x.district){document.getElementById("district").value=x.district;thanas();document.getElementById("thana").value=x.thana||""}if(x.referenceDistrict1){document.getElementById("referenceDistrict1").value=x.referenceDistrict1;referenceThanas(1);document.getElementById("referenceThana1").value=x.referenceThana1||""}if(x.referenceDistrict2){document.getElementById("referenceDistrict2").value=x.referenceDistrict2;referenceThanas(2);document.getElementById("referenceThana2").value=x.referenceThana2||""}updateSubDesignation();updateGrossSalary();updateVehicleVisibility();updateLicenceVisibility();updateReferenceVisibility();if(x.subDesignation){document.getElementById("subDesignation").value=x.subDesignation;updateGhatVisibility();updateDriverCategoryOptions();if(x.driverCategory){document.getElementById("driverCategory").value=x.driverCategory}if(x.tempDriverCategory){document.getElementById("tempDriverCategory").value=x.tempDriverCategory}if(x.ghatName){document.getElementById("ghatName").value=x.ghatName;const ltGhatEl=document.getElementById("ltGhatName");if(ltGhatEl)ltGhatEl.value=x.ghatName}if(x.workingLocation&&(x.subDesignation==="Ghat Driver"||x.subDesignation==="Ghat Helper")){const ltGhatEl2=document.getElementById("ltGhatName");if(ltGhatEl2)ltGhatEl2.value=x.workingLocation;const ghatEl2=document.getElementById("ghatName");if(ghatEl2)ghatEl2.value=x.workingLocation}}if(x.grossSalary!==undefined)document.getElementById("grossSalary").value=x.grossSalary;if((x.designation||"")==="Driver"){const lbn=document.getElementById("ltBkashNo"),lbo=document.getElementById("ltBkashOwner");if(lbn&&x.bkashNo!==undefined)lbn.value=x.bkashNo;if(lbo&&x.bkashOwner!==undefined)lbo.value=x.bkashOwner}age();licenceDaysCalc();updateOfficeSection();updateDeclaration();refreshAllSelects();updateWorkingLocation();updatePageVisibility()}
+function data(){updateWorkingLocation();let x={};ids.forEach(i=>{let el=document.getElementById(i);x[i]=el.value;if(el.dataset&&el.dataset.iso)x[i+"_iso"]=el.dataset.iso});if(document.getElementById("designation").value==="Driver"){const lbn=document.getElementById("ltBkashNo"),lbo=document.getElementById("ltBkashOwner");if(lbn)x.bkashNo=lbn.value;if(lbo)x.bkashOwner=lbo.value}const fd=document.getElementById("fillDate");x.dataEntryDate=fd?fd.textContent.replace(/^Date:\s*/,"").trim():"";CONTACT_ROWS.forEach(function(r){x[r[0]]=composeContact(r[1])});return x}
+function set(x){const dateIds=["joiningDate","birthDate","licenceValidity"];ids.forEach(i=>{let el=document.getElementById(i);if(el&&x[i]!==undefined){el.value=x[i];if(x[i+"_iso"]){el.dataset.iso=x[i+"_iso"]}else if(dateIds.includes(i)&&x[i]){const p=parseDateStr(String(x[i]));if(p)el.dataset.iso=p.y+"-"+pad(p.m+1)+"-"+pad(p.d)}}});const ltJoinEl=document.getElementById("ltJoinDate");if(ltJoinEl&&x.joiningDate!==undefined){ltJoinEl.value=x.joiningDate;if(x.joiningDate_iso)ltJoinEl.dataset.iso=x.joiningDate_iso;else delete ltJoinEl.dataset.iso}if(x.district){document.getElementById("district").value=x.district;thanas();document.getElementById("thana").value=x.thana||""}if(x.referenceDistrict1){document.getElementById("referenceDistrict1").value=x.referenceDistrict1;referenceThanas(1);document.getElementById("referenceThana1").value=x.referenceThana1||""}if(x.referenceDistrict2){document.getElementById("referenceDistrict2").value=x.referenceDistrict2;referenceThanas(2);document.getElementById("referenceThana2").value=x.referenceThana2||""}updateSubDesignation();updateGrossSalary();updateVehicleVisibility();updateLicenceVisibility();updateReferenceVisibility();if(x.subDesignation){document.getElementById("subDesignation").value=x.subDesignation;updateGhatVisibility();updateDriverCategoryOptions();if(x.driverCategory){document.getElementById("driverCategory").value=x.driverCategory}if(x.tempDriverCategory){document.getElementById("tempDriverCategory").value=x.tempDriverCategory}if(x.ghatName){document.getElementById("ghatName").value=x.ghatName;const ltGhatEl=document.getElementById("ltGhatName");if(ltGhatEl)ltGhatEl.value=x.ghatName}if(x.workingLocation&&(x.subDesignation==="Ghat Driver"||x.subDesignation==="Ghat Helper")){const ltGhatEl2=document.getElementById("ltGhatName");if(ltGhatEl2)ltGhatEl2.value=x.workingLocation;const ghatEl2=document.getElementById("ghatName");if(ghatEl2)ghatEl2.value=x.workingLocation}}if(x.grossSalary!==undefined)document.getElementById("grossSalary").value=x.grossSalary;if((x.designation||"")==="Driver"){const lbn=document.getElementById("ltBkashNo"),lbo=document.getElementById("ltBkashOwner");if(lbn&&x.bkashNo!==undefined)lbn.value=x.bkashNo;if(lbo&&x.bkashOwner!==undefined)lbo.value=x.bkashOwner}age();licenceDaysCalc();updateOfficeSection();updateDeclaration();refreshAllSelects();updateWorkingLocation();updatePageVisibility()
+  // ৪র্থ পাতার Family Member / Relative-Friend তথ্য ফিরিয়ে আনা
+  CONTACT_ROWS.forEach(function(r){applyContact(r[1],x[r[0]])});
+  // রেফারেন্স: শিটে শুধু কোড+নাম থাকে — কোড ধরে রেফারেন্সের নাম, মোবাইল ও ঠিকানা নতুন করে এনে ভরা হয় (পেলে শিটের নাম বদলে সর্বশেষ তথ্য বসে)
+  [1,2].forEach(function(n){const c=document.getElementById("referenceCode"+n);if(c&&String(c.value||"").trim())lookupReference(n,true)});
+}
 // এই ৪টি পদবী হলে সরাসরি স্থায়ী কোড (GUARANTOR_DES-এর সাথে একই তালিকা, পুনঃব্যবহার)
 const PERMANENT_DES=GUARANTOR_DES;
 // এই ৬টি পদবী হলে অস্থায়ী DT কোড (FULL_APPROVAL_DES-এর সাথে একই তালিকা, পুনঃব্যবহার)
@@ -1001,7 +1006,24 @@ const TEMP_DES=FULL_APPROVAL_DES;
 // কোড প্যাটার্ন: Driver স্থায়ী কোড CD-0001..., Helper স্থায়ী কোড CH-0001..., Temp কোড DT-100...
 const DRIVER_PREFIX="CD-",HELPER_PREFIX="CH-",TEMP_PREFIX="DT-";
 function buildCode(prefix,n,pad){return prefix+String(n).padStart(pad,"0")}
-async function lookupReference(n){
+// ===== ৪র্থ পাতার Family Member ও Relative-Friend তথ্য: প্রতি সারি = শিটের একটি সেল =====
+// ফরম্যাট: "Name: ... | Relationship: ... | Mobile No.: ... | Address: ..." (ফাঁকা অংশ বাদ যায়)
+const CONTACT_ROWS=[["familyInfo1","fm1"],["familyInfo2","fm2"],["familyInfo3","fm3"],["relativeInfo1","rf1"],["relativeInfo2","rf2"],["relativeInfo3","rf3"]];
+function cellTxt(id){const e=document.getElementById(id);return e?e.textContent.replace(/\u00a0/g," ").replace(/\s+/g," ").replace(/\|/g,"/").trim():""}
+function composeContact(p){
+  const parts=[];
+  [["Name","Name"],["Relationship","Rel"],["Mobile No.","Mobile"],["Address","Addr"]].forEach(function(a){const v=cellTxt(p+a[1]);if(v)parts.push(a[0]+": "+v)});
+  return parts.join(" | ");
+}
+function applyContact(p,str){
+  const map={"Name":"Name","Relationship":"Rel","Mobile No.":"Mobile","Address":"Addr"};
+  ["Name","Rel","Mobile","Addr"].forEach(function(sfx){const e=document.getElementById(p+sfx);if(e)e.textContent=""});
+  String(str||"").split(" | ").forEach(function(part){
+    const m=part.match(/^(Name|Relationship|Mobile No\.|Address):\s*(.*)$/);
+    if(m){const e=document.getElementById(p+map[m[1]]);if(e)e.textContent=m[2]}
+  });
+}
+async function lookupReference(n,silent){
   const codeEl=document.getElementById("referenceCode"+n);
   const code=codeEl.value.trim();
   if(!code)return;
@@ -1020,13 +1042,14 @@ async function lookupReference(n){
         document.getElementById("referenceThana"+n).value=d.thana||"";
       }
       refreshAllSelects();
-      toast("✅ রেফারেন্সের তথ্য পাওয়া গেছে — "+code);
-    }else{
+      syncPages();   // ৪র্থ পাতার Referring Driver-এর ঠিকানা/মোবাইল সাথে সাথে হালনাগাদ
+      if(!silent)toast("✅ রেফারেন্সের তথ্য পাওয়া গেছে — "+code);
+    }else if(!silent){
       toast("⚠️ এই কোডে কোনো তথ্য নেই — ম্যানুয়ালি পূরণ করুন","warn");
     }
   }catch(e){
     console.error(e);
-    toast("❌ সার্ভারে সংযোগ করা যায়নি","bad");
+    if(!silent)toast("❌ সার্ভারে সংযোগ করা যায়নি","bad");
   }
 }
 async function nextTempFromSheet(){
