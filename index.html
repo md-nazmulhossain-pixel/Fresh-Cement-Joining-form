@@ -284,6 +284,7 @@ body.helperTheme #page1 .sig{justify-content:space-between}
 </style></head><body>
 <div class="bar"><button class="s" id="saveBtn" onclick="save()">💾 SAVE</button><button class="q" onclick="search()">🔍 SEARCH</button><button class="u" id="updateBtn" onclick="update()">✏ UPDATE</button><button class="c" onclick="clearF()">🧹 CLEAR</button><button class="p" onclick="printForm()">🖨 PRINT</button><span id="mode">🟢 NEW ENTRY</span></div>
 <div class="page" id="page1">
+<div id="helperBadge">HELPER</div>
 
 <div class="head">
   <div class="head-left">
@@ -312,7 +313,7 @@ body.helperTheme #page1 .sig{justify-content:space-between}
 </div>
 </div></div>
 
-<div class="sec"><div class="st">2. Personal Information</div><div class="ct">
+<div class="sec"><div class="st">2. Personal Information</div><div class="ct" id="secPersonal">
 <div class="g4" style="margin-bottom:3px"><div class="f"><label>Father Name</label><input id="fatherName"></div><div class="f"><label>Father's Mobile Number</label><input id="fatherMobile" type="tel" maxlength="12" inputmode="numeric" oninput="formatMobile(this)"></div><div class="f"><label>Mother Name</label><input id="motherName"></div><div class="f"><label>Mother's Mobile Number</label><input id="motherMobile" type="tel" maxlength="12" inputmode="numeric" oninput="formatMobile(this)"></div></div>
 <div class="g4" style="margin-bottom:3px"><div class="f"><label>Village</label><input id="village"></div><div class="f"><label>Post Office</label><input id="postOffice"></div><div class="f"><label>Thana</label><select id="thana"><option value="">Select Thana</option></select></div><div class="f"><label>District</label><select id="district" onchange="thanas()"></select></div></div>
 <div class="g4" style="margin-bottom:3px"><div class="f"><label>NID No. / Birth Certificate No.</label><input id="nidNumber"></div><div class="f"><label>Birth Date</label><div class="dwrap"><input id="birthDate" placeholder="dd-mmmm-yyyy"><button type="button" class="dbtn" onclick="pickDate('birthDate',age)">&#128197;</button></div></div><div class="splitCell"><div class="f"><label>Age</label><input id="age" class="ro" readonly></div><div class="f"><label>Blood Group</label><select id="bloodGroup"><option value="">Select</option><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>AB+</option><option>AB-</option><option>O+</option><option>O-</option></select></div></div><div class="f"><label>Religion</label><select id="religion"><option value="">Select Religion</option><option>Islam</option><option>Hinduism</option><option>Christianity</option><option>Buddhism</option><option>Other</option></select></div></div>
@@ -711,6 +712,7 @@ function updatePageVisibility(){
   document.body.classList.toggle("printAppraisalOnly",newStage);
   updateRequiredMarks();
   document.body.classList.toggle("helperTheme",val==="Helper");
+  const ttl=document.querySelector("#page1 .title");if(ttl)ttl.textContent=(val==="Helper")?"HELPER JOINING FORM":"EMPLOYEE JOINING FORM";
   const pt=document.getElementById("helperProfileTag");
   if(pt){const show=(val==="Helper"||val==="Driver");pt.style.display=show?"block":"none";pt.textContent=show?(val+" Profile"):"";pt.style.color=(val==="Helper")?"#0b6b2e":"#c00000"}
   syncPages();
@@ -1363,3 +1365,117 @@ window.onload=function(){
   if(!getFormKey())showLogin();else fetch(SHEET_URL).catch(function(){});
 };
 </script></body></html>
+
+<style id="new-style-theme-override">
+/* Theme-only override: original HTML IDs, JavaScript, events and data flow remain unchanged. */
+:root{--ns-navy:#0f2a43;--ns-teal:#0e7490;--ns-teal-light:#e0f2fe;--ns-amber:#f59e0b;--ns-amber-light:#fef3c7;--ns-ink:#1e293b;--ns-muted:#64748b;--ns-line:#cbd5e1;--ns-bg:#f1f5f9}
+body{background:var(--ns-bg)!important;color:var(--ns-ink)!important;font-family:'Hind Siliguri','Poppins',Arial,sans-serif!important}
+.bar{width:min(210mm,calc(100% - 24px))!important;margin:16px auto!important;padding:10px!important;background:#fff!important;border:1px solid var(--ns-line)!important;border-radius:14px!important;box-shadow:0 8px 24px rgba(15,42,67,.10)!important}
+.bar button{border-radius:8px!important;background:var(--ns-navy)!important;box-shadow:none!important;transition:.2s!important}.bar button:hover{transform:translateY(-1px);background:var(--ns-teal)!important}.bar .s{background:var(--ns-teal)!important}.bar .u{background:var(--ns-amber)!important}.bar .p{background:#be123c!important}
+#mode{background:var(--ns-teal-light)!important;border-color:#7dd3fc!important;color:var(--ns-navy)!important;border-radius:8px!important}
+.page{background:#fff!important;box-shadow:0 10px 40px rgba(15,42,67,.12)!important;border-radius:16px!important;padding:8mm 10mm!important;overflow:hidden!important}.page::after{content:''!important;position:absolute!important;top:0!important;left:0!important;right:0!important;height:6px!important;background:linear-gradient(90deg,var(--ns-navy),var(--ns-teal) 55%,var(--ns-amber))!important;z-index:3!important}.page::before{opacity:.035!important}
+.head{border-bottom:2px solid var(--ns-teal-light)!important;padding-bottom:7px!important}.head-mid b,.head-mid small{color:var(--ns-navy)!important}.title,.dpBar{background:linear-gradient(90deg,var(--ns-teal),#0284c7)!important;border-radius:999px!important;box-shadow:0 4px 12px rgba(14,116,144,.22)!important}.photo-box{border-color:#7dd3fc!important;background:#f8fafc!important}
+.sec{border-color:var(--ns-line)!important;background:#fff!important;border-radius:12px!important;box-shadow:0 2px 8px rgba(15,42,67,.05)!important;margin-bottom:7px!important}.st{background:linear-gradient(90deg,var(--ns-navy),var(--ns-teal))!important;color:#fff!important;padding:5px 9px!important}.ct{padding:6px 9px!important}
+.f label,.refTitle{color:var(--ns-teal)!important}.f input,.f select,.f textarea,.idmini input{border-color:var(--ns-line)!important;border-radius:6px!important;background:#fff!important;color:var(--ns-ink)!important}.f input:focus,.f select:focus,.f textarea:focus{outline:2px solid #7dd3fc!important;border-color:var(--ns-teal)!important}.ro{background:#f8fafc!important}.salaryNote,.note{background:var(--ns-amber-light)!important;border-color:var(--ns-amber)!important;color:var(--ns-ink)!important}
+.declBox{background:linear-gradient(135deg,#f8fafc,#e0f2fe)!important;border-color:#7dd3fc!important;border-style:dashed!important}.office{border-color:var(--ns-navy)!important;background:linear-gradient(135deg,#fff,var(--ns-teal-light))!important}.ot{background:transparent!important;color:var(--ns-navy)!important;letter-spacing:1px!important}.appline,.sig .sigItem,.refSigItem{border-color:var(--ns-navy)!important}
+table th,.ratingTable th,.dpTable th,.trTable th{background:var(--ns-navy)!important;color:#fff!important;border-color:var(--ns-line)!important}table td,.ratingTable td,.dpTable td,.trTable td{border-color:var(--ns-line)!important}.ratingTable tr:nth-child(even),.dpTable tr:nth-child(even),.trTable tr:nth-child(even){background:#f8fafc!important}.pointsGrid,.remarksBox,.intCols{border-color:var(--ns-line)!important}.ptCol,.remCol,.intCol{border-color:var(--ns-line)!important}.markBox{border-color:var(--ns-teal)!important;color:var(--ns-navy)!important;background:var(--ns-teal-light)!important}.trRules{border-color:var(--ns-teal)!important;background:#f8fafc!important}
+@media print{body{background:#fff!important}.bar,#toast{display:none!important}.page{box-shadow:none!important;border-radius:0!important;margin:0!important}.page::after{height:4px!important}}
+</style>
+<style id="fix-update-2026-10">
+/* 1) Section headings (1. Employee Information, 2. Personal Information ...) - always visible */
+.st,.st *{color:#fff!important}
+.st{background:#000!important;background-image:none!important}
+/* 2) Field labels: 2 steps larger (9.5px -> 11.5px) on the joining form page */
+#page1 .f label{font-size:11.5px!important;line-height:1.15!important;margin-bottom:1px!important}
+/* 3) Compact spacing so Helper (and Driver) page is never cut at the bottom */
+#page1{padding:6mm 9mm!important}
+#page1 .head{padding-bottom:4px!important}
+#page1 .sec{margin-bottom:4px!important}
+#page1 .st{padding:3px 9px!important}
+#page1 .ct{padding:4px 9px!important}
+#page1 .f input,#page1 .f select{height:22px!important}
+#page1 .g4,#page1 .gbk,#page1 .refCodeRow{row-gap:2px!important}
+@media print{
+  /* 4) Deep black print for all text */
+  html,body,.page,.page *{color:#000!important;-webkit-text-fill-color:#000!important;text-shadow:none!important}
+  .page *{-webkit-text-stroke:.12px #000}
+  .f input,.f select,.f textarea,.idmini input{color:#000!important;font-weight:bold!important;border-color:#000!important}
+  .f input::placeholder,.f textarea::placeholder{color:#000!important;-webkit-text-fill-color:#000!important;opacity:1!important}
+  .f select.ph{color:#000!important;font-weight:bold!important}
+  /* dark/colored bars -> light background so black text stays readable */
+  .title,.dpBar,table th,.ratingTable th,.dpTable th,.trTable th{background:#e5e7eb!important;background-image:none!important;border:1px solid #000!important;box-shadow:none!important}
+  .sec,.declBox,.office,.salaryNote,.markBox,.trRules{border-color:#000!important}
+  .page::before{opacity:.04!important}
+  /* section headers: white text on solid black */
+  .page .st,.page .st *{color:#fff!important;-webkit-text-fill-color:#fff!important;-webkit-text-stroke:0!important}
+  .page .st{background:#000!important;background-image:none!important;border:1px solid #000!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  /* every table: black text and black borders */
+  .page table,.page th,.page td{border-color:#000!important;color:#000!important}
+  .page table th,.page table td{border:1px solid #000!important}
+  .page table tr:nth-child(even){background:#fff!important}
+}
+</style>
+<style id="fix-personal-gap">
+#secPersonal{padding-top:6px!important;padding-bottom:6px!important}
+#secPersonal .g4{row-gap:0!important;column-gap:12px!important;margin-bottom:11px!important}
+#secPersonal .g4:last-child{margin-bottom:0!important}
+#secPersonal .f label{margin-bottom:3px!important}
+</style>
+<style id="fix-office-compact">
+#page1 .apps{gap:12px 12px!important;padding:10px 14px 8px!important}
+#page1 .app{height:46px!important}
+#page1 .sig{margin-top:22px!important}
+</style>
+<style id="fix-boxes-v3">
+/* Page 1: wider inputs + larger typed text */
+#page1{padding-left:6mm!important;padding-right:6mm!important}
+#page1 .ct{padding-left:7px!important;padding-right:7px!important}
+#page1 .g4,#page1 .g3,#page1 .g2,#page1 .top,#page1 .splitCell{column-gap:7px!important}
+#secPersonal .g4{column-gap:9px!important}
+#page1 .gbk,#page1 .refCodeRow{column-gap:7px!important}
+#page1 .refCodeRow{grid-template-columns:104px 1fr 1fr!important}
+#page1 .f input,#page1 .f select,#page1 .f textarea{font-size:12.5px!important;height:24px!important;padding-left:5px!important;padding-right:4px!important}
+#page1 .f input[type=tel],#page1 .f input[type=number]{letter-spacing:0!important}
+@media print{
+  /* Every page (1-5): all boxes, lines, tables, borders and outlines deep black */
+  .page *,.page *::before,.page *::after{border-color:#000!important;outline-color:#000!important}
+  .page .photo-box,.page .head,.page .refBlock,.page .interviewerHead{border-color:#000!important}
+  .page .photo-box{border-style:dashed!important}
+  .page .sig .sigItem,.page .appline,.page .refSigItem{border-color:#000!important}
+}
+</style>
+<style id="fix-signature-space">
+#page1 .refSig{margin-top:18px!important}
+#page1 .app{height:68px!important}
+#page1 .apps{gap:8px 12px!important;padding:8px 14px 6px!important}
+</style>
+<style id="fix-helper-green">
+/* Helper form: green section headers (screen + print), green heading text on screen */
+body.helperTheme #page1 .st{background:#0b6b2e!important;background-image:none!important}
+body.helperTheme #page1 .head-mid b{color:#0b6b2e!important}
+body.helperTheme #page1 .title{color:#0b6b2e!important;background:#e7f6ec!important;border:1px solid #0b6b2e!important}
+body.helperTheme #page1 .f label{color:#0b4d22!important}
+@media print{
+  body.helperTheme #page1 .st{background:#0b6b2e!important;background-image:none!important;border-color:#0b6b2e!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body.helperTheme #page1 .head-mid b,body.helperTheme #page1 .title,body.helperTheme #page1 .f label,body.helperTheme #page1 #helperProfileTag{color:#000!important;-webkit-text-fill-color:#000!important}
+  body.helperTheme #page1 .title{background:#e5e7eb!important;border-color:#000!important}
+}
+</style>
+<style id="helper-identity">
+#helperBadge{display:none}
+body.helperTheme #helperBadge{display:block;position:absolute;top:6px;left:0;z-index:5;background:#0b6b2e;color:#fff;font-weight:bold;font-size:12px;letter-spacing:1.5px;padding:3px 16px 3px 12px;border-radius:0 0 10px 0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+body.helperTheme #page1{box-shadow:inset 0 0 0 3px #0b6b2e,0 10px 40px rgba(11,107,46,.15)!important}
+body.helperTheme #page1::after{background:#0b6b2e!important;height:8px!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+body.helperTheme #page1 .photo-box{border-color:#0b6b2e!important}
+@media print{
+  body.helperTheme #page1{box-shadow:inset 0 0 0 3px #0b6b2e!important}
+  body.helperTheme #page1::after{height:8px!important}
+  body.helperTheme .page #helperBadge{color:#fff!important;-webkit-text-fill-color:#fff!important;-webkit-text-stroke:0!important}
+}
+</style>
+<style id="light-entry-borders">
+@media print{
+  /* entry boxes keep the original light border (text inside stays deep black) */
+  .page .f input,.page .f select,.page .f textarea,.page input,.page select,.page textarea{border-color:#cbd5e1!important}
+}
+</style>
