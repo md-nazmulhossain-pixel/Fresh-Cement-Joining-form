@@ -1300,6 +1300,7 @@ const SHEET_URL="https://script.google.com/macros/s/AKfycbxIggc9iT9nZBkfFIXi8nvT
 var SAVE_TO_SHEET=true;
 document.addEventListener("DOMContentLoaded",function(){var tb=document.getElementById("testBadge");if(tb)tb.style.display=SAVE_TO_SHEET?"none":""});
 function switchForm(w){
+  if(document.body.classList.contains("vesselOnly"))w="vessel";
   const v=(w==="vessel");
   document.body.classList.toggle("vesselMode",v);
   document.getElementById("fsDriver").classList.toggle("on",!v);
@@ -1338,27 +1339,67 @@ window.fetch=function(u,o){
   }
   return _origFetch(u,o);
 };
+// ===== জাহাজ (Vessels) ব্যবহারকারী: পাসওয়ার্ডের জায়গায় ইমেইল =====
+// এই তালিকার ইমেইল লগইন বক্সে লিখলে শুধু Vessels Form খোলে; Driver/Helper ফর্ম খোলে না এবং
+// Driver/Helper-এর পাসওয়ার্ড (FORM_KEY) এই ব্যবহারকারীর কাছে কখনোই যায় না।
+// ↓↓↓ জাহাজ ফর্মের ব্যবহারকারীর ইমেইল এখানে লিখুন (একাধিক হলে কমা দিয়ে) ↓↓↓
+const VESSEL_USERS=["mohsin.islam@mgi.org"];
+function getVesselUser(){
+  try{
+    const e=String(sessionStorage.getItem("ucilVesselUser")||"").trim().toLowerCase();
+    if(!e)return "";
+    return VESSEL_USERS.map(function(x){return String(x).trim().toLowerCase()}).indexOf(e)>-1?e:"";
+  }catch(x){return ""}
+}
+function enterVesselOnly(email){
+  document.body.classList.add("vesselOnly");
+  const fs=document.getElementById("formSwitch");
+  if(fs&&!document.getElementById("vesselUserChip")){
+    const chip=document.createElement("span");chip.id="vesselUserChip";
+    chip.innerHTML='🚢 Vessels Form &nbsp;|&nbsp; <b></b> <button type="button">লগআউট</button>';
+    chip.querySelector("b").textContent=email;
+    chip.querySelector("button").onclick=function(){try{sessionStorage.removeItem("ucilVesselUser")}catch(e){}location.reload()};
+    fs.insertBefore(chip,fs.firstChild);
+  }
+  switchForm("vessel");
+}
 function showLogin(msg){
   let ov=document.getElementById("loginOverlay");
   if(!ov){
     ov=document.createElement("div");ov.id="loginOverlay";
     ov.style.cssText="position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:100000;display:flex;align-items:center;justify-content:center;font-family:Arial,sans-serif";
-    ov.innerHTML='<div style="background:#fff;border-radius:10px;padding:22px 26px;width:320px;box-shadow:0 8px 30px #0006;text-align:center"><div style="font-weight:bold;font-size:15px;margin-bottom:4px">UCIL Transport Division</div><div style="font-size:12px;color:#555;margin-bottom:12px">ফর্ম ব্যবহার করতে পাসওয়ার্ড দিন</div><input id="loginKey" type="password" placeholder="পাসওয়ার্ড" style="width:100%;box-sizing:border-box;padding:9px;font-size:14px;border:1px solid #999;border-radius:5px"><div id="loginMsg" style="color:#c0392b;font-size:12px;min-height:16px;margin:8px 0"></div><button id="loginBtn" style="background:#b02a37;color:#fff;border:0;border-radius:5px;padding:9px 26px;font-weight:bold;cursor:pointer">প্রবেশ করুন</button></div>';
+    ov.innerHTML='<div style="background:#fff;border-radius:10px;padding:22px 26px;width:330px;max-width:92vw;box-shadow:0 8px 30px #0006;text-align:center"><div style="font-weight:bold;font-size:15px;margin-bottom:4px">UCIL Transport Division</div><div style="font-size:12px;color:#555;margin-bottom:12px">ফর্ম ব্যবহার করতে পাসওয়ার্ড দিন<br><span style="font-size:11px;color:#777">(জাহাজ ফর্মের ব্যবহারকারী পাসওয়ার্ডের জায়গায় ইমেইল দিন)</span></div><input id="loginKey" type="password" placeholder="পাসওয়ার্ড / ইমেইল" autocomplete="off" style="width:100%;box-sizing:border-box;padding:9px;font-size:14px;border:1px solid #999;border-radius:5px"><div id="loginMsg" style="color:#c0392b;font-size:12px;min-height:16px;margin:8px 0"></div><button id="loginBtn" style="background:#b02a37;color:#fff;border:0;border-radius:5px;padding:9px 26px;font-weight:bold;cursor:pointer">প্রবেশ করুন</button></div>';
     document.body.appendChild(ov);
+    const inp=document.getElementById("loginKey");
+    // ইমেইল লিখলে (@ থাকলে) অক্ষরগুলো দেখা যায়; পাসওয়ার্ড লিখলে ঢাকা থাকে
+    inp.addEventListener("input",function(){
+      const want=inp.value.indexOf("@")>-1?"text":"password";
+      if(inp.type!==want){const st=inp.selectionStart;inp.type=want;try{inp.setSelectionRange(st,st)}catch(e){}}
+    });
     const go=async function(){
-      const v=document.getElementById("loginKey").value;
-      if(!v){document.getElementById("loginMsg").textContent="পাসওয়ার্ড লিখুন";return}
+      const v=inp.value.trim();
+      if(!v){document.getElementById("loginMsg").textContent="পাসওয়ার্ড বা ইমেইল লিখুন";return}
+      // ---- ইমেইল: জাহাজ ফর্ম (Driver/Helper সার্ভারে কোনো অনুরোধ যায় না) ----
+      if(v.indexOf("@")>-1){
+        const low=v.toLowerCase();
+        if(VESSEL_USERS.map(function(x){return String(x).trim().toLowerCase()}).indexOf(low)>-1){
+          try{sessionStorage.setItem("ucilVesselUser",low);sessionStorage.removeItem("ucilFormKey")}catch(e){}
+          location.reload();return;
+        }
+        document.getElementById("loginMsg").textContent="এই ইমেইলের অনুমতি নেই";return;
+      }
+      // ---- পাসওয়ার্ড: Driver/Helper ফর্ম ----
       const btn=document.getElementById("loginBtn");btn.disabled=true;btn.textContent="যাচাই হচ্ছে...";
       try{
-        const r=await _origFetch(SHEET_URL+"?key="+encodeURIComponent(v));
+        const r=await _origFetch(SHEET_URL+"?key="+encodeURIComponent(inp.value));
         const j=await r.json();
-        if(j&&j.result==="success"){try{sessionStorage.setItem("ucilFormKey",v)}catch(e){}location.reload();return}
+        if(j&&j.result==="success"){try{sessionStorage.setItem("ucilFormKey",inp.value);sessionStorage.removeItem("ucilVesselUser")}catch(e){}location.reload();return}
         document.getElementById("loginMsg").textContent=(j&&j.message)||"পাসওয়ার্ড ভুল";
       }catch(e){document.getElementById("loginMsg").textContent="সার্ভারে সংযোগ করা যায়নি"}
       btn.disabled=false;btn.textContent="প্রবেশ করুন";
     };
     document.getElementById("loginBtn").onclick=go;
-    document.getElementById("loginKey").addEventListener("keydown",function(e){if(e.key==="Enter")go()});
+    inp.addEventListener("keydown",function(e){if(e.key==="Enter")go()});
   }
   if(msg)document.getElementById("loginMsg").textContent=msg;
   try{sessionStorage.removeItem("ucilFormKey")}catch(e){}
@@ -1703,7 +1744,11 @@ function updateLicenceVisibility(){
   const jb=document.getElementById("joiningDateBox"),jd=document.getElementById("joiningDate");
   const showJoin=(val==="Helper");
   jb.style.display=showJoin?"":"none";
-  if(!showJoin){jd.value="";delete jd.dataset.iso;}
+  if(!showJoin){   // Driver: ঘরটা লুকানো; মান আসে পাতা ৩-এর যোগদানের তারিখ (ltJoinDate) থেকে — ফাঁকা করে দেওয়া হয় না
+    const lj=document.getElementById("ltJoinDate");
+    jd.value=lj?String(lj.value||"").trim():"";
+    if(lj&&lj.dataset.iso)jd.dataset.iso=lj.dataset.iso;else delete jd.dataset.iso;
+  }
 }
 const FULL_APPROVAL_DES=["Driver"];
 const GUARANTOR_DES=["Helper"];
@@ -1741,7 +1786,7 @@ document.addEventListener("change",function(e){if(e.target&&e.target.tagName==="
 function formatMobile(el){let v=el.value.replace(/\D/g,"").slice(0,11);el.value=v.length>5?v.slice(0,5)+"-"+v.slice(5):v}
 function age(){let inp=document.getElementById("birthDate"),iso=inp.dataset.iso,out=document.getElementById("age");if(!iso){out.value="";return}let d=new Date(iso+"T00:00:00"),t=new Date(),y=t.getFullYear()-d.getFullYear();if(t.getMonth()<d.getMonth()||(t.getMonth()==d.getMonth()&&t.getDate()<d.getDate()))y--;out.value=y+(y===1?" Year":" Years")}
 function licenceDaysCalc(){let inp=document.getElementById("licenceValidity"),iso=inp&&inp.dataset.iso,out=document.getElementById("licenceDaysLeft");if(!out)return;if(!iso){out.value="";return}let d=new Date(iso+"T00:00:00"),t=new Date();t.setHours(0,0,0,0);if(d<t){out.value="Expired";return}let y=d.getFullYear()-t.getFullYear(),m=d.getMonth()-t.getMonth(),dd=d.getDate()-t.getDate();if(dd<0){m--;dd+=new Date(d.getFullYear(),d.getMonth(),0).getDate()}if(m<0){y--;m+=12}let parts=[];if(y>0)parts.push(y+(y===1?" Year":" Years"));if(m>0)parts.push(m+(m===1?" Month":" Months"));if(dd>0||parts.length===0)parts.push(dd+(dd===1?" Day":" Days"));out.value=parts.join(" ")}
-function data(){updateWorkingLocation();let x={};ids.forEach(i=>{let el=document.getElementById(i);x[i]=el.value;if(el.dataset&&el.dataset.iso)x[i+"_iso"]=el.dataset.iso});if(document.getElementById("designation").value==="Driver"){const lbn=document.getElementById("ltBkashNo"),lbo=document.getElementById("ltBkashOwner");if(lbn)x.bkashNo=lbn.value;if(lbo)x.bkashOwner=lbo.value}const fd=document.getElementById("fillDate");x.dataEntryDate=fd?fd.textContent.replace(/^Date:\s*/,"").trim():"";CONTACT_ROWS.forEach(function(r){x[r[0]]=composeContact(r[1])});return x}
+function data(){updateWorkingLocation();let x={};ids.forEach(i=>{let el=document.getElementById(i);x[i]=el.value;if(el.dataset&&el.dataset.iso)x[i+"_iso"]=el.dataset.iso});if(document.getElementById("designation").value==="Driver"){const lbn=document.getElementById("ltBkashNo"),lbo=document.getElementById("ltBkashOwner");if(lbn)x.bkashNo=lbn.value;if(lbo)x.bkashOwner=lbo.value}if(document.getElementById("designation").value!=="Helper"){const lj=document.getElementById("ltJoinDate");if(lj&&String(lj.value||"").trim()){x.joiningDate=lj.value.trim();if(lj.dataset&&lj.dataset.iso)x.joiningDate_iso=lj.dataset.iso}}const fd=document.getElementById("fillDate");x.dataEntryDate=fd?fd.textContent.replace(/^Date:\s*/,"").trim():"";CONTACT_ROWS.forEach(function(r){x[r[0]]=composeContact(r[1])});return x}
 function set(x){const dateIds=["joiningDate","birthDate","licenceValidity"];ids.forEach(i=>{let el=document.getElementById(i);if(el&&x[i]!==undefined){el.value=x[i];if(x[i+"_iso"]){el.dataset.iso=x[i+"_iso"]}else if(dateIds.includes(i)&&x[i]){const p=parseDateStr(String(x[i]));if(p)el.dataset.iso=p.y+"-"+pad(p.m+1)+"-"+pad(p.d)}}});const ltJoinEl=document.getElementById("ltJoinDate");if(ltJoinEl&&x.joiningDate!==undefined){ltJoinEl.value=x.joiningDate;if(x.joiningDate_iso)ltJoinEl.dataset.iso=x.joiningDate_iso;else delete ltJoinEl.dataset.iso}if(x.district){document.getElementById("district").value=x.district;thanas();document.getElementById("thana").value=x.thana||""}if(x.referenceDistrict1){document.getElementById("referenceDistrict1").value=x.referenceDistrict1;referenceThanas(1);document.getElementById("referenceThana1").value=x.referenceThana1||""}if(x.referenceDistrict2){document.getElementById("referenceDistrict2").value=x.referenceDistrict2;referenceThanas(2);document.getElementById("referenceThana2").value=x.referenceThana2||""}updateSubDesignation();updateGrossSalary();updateVehicleVisibility();updateLicenceVisibility();updateReferenceVisibility();if(x.subDesignation){document.getElementById("subDesignation").value=x.subDesignation;updateGhatVisibility();updateDriverCategoryOptions();if(x.driverCategory){document.getElementById("driverCategory").value=x.driverCategory}if(x.tempDriverCategory){document.getElementById("tempDriverCategory").value=x.tempDriverCategory}if(x.ghatName){document.getElementById("ghatName").value=x.ghatName;const ltGhatEl=document.getElementById("ltGhatName");if(ltGhatEl)ltGhatEl.value=x.ghatName}if(x.workingLocation&&(x.subDesignation==="Ghat Driver"||x.subDesignation==="Ghat Helper")){const ltGhatEl2=document.getElementById("ltGhatName");if(ltGhatEl2)ltGhatEl2.value=x.workingLocation;const ghatEl2=document.getElementById("ghatName");if(ghatEl2)ghatEl2.value=x.workingLocation}}if(x.grossSalary!==undefined)document.getElementById("grossSalary").value=x.grossSalary;if((x.designation||"")==="Driver"){const lbn=document.getElementById("ltBkashNo"),lbo=document.getElementById("ltBkashOwner");if(lbn&&x.bkashNo!==undefined)lbn.value=x.bkashNo;if(lbo&&x.bkashOwner!==undefined)lbo.value=x.bkashOwner}age();licenceDaysCalc();updateOfficeSection();updateDeclaration();refreshAllSelects();updateWorkingLocation();updatePageVisibility()
   // ৪র্থ পাতার Family Member / Relative-Friend তথ্য ফিরিয়ে আনা
   CONTACT_ROWS.forEach(function(r){applyContact(r[1],x[r[0]])});
@@ -2184,6 +2229,8 @@ function parseDateStr(str){
 }
 function handleTypedDate(inp,cb){const val=inp.value.trim();if(!val){delete inp.dataset.iso;if(cb)cb();return}const p=parseDateStr(val);if(p){inp.value=fmtDate(new Date(p.y,p.m,p.d));inp.dataset.iso=p.y+"-"+pad(p.m+1)+"-"+pad(p.d)}else{delete inp.dataset.iso}if(cb)cb()}
 window.onload=function(){
+  const vu=getVesselUser();
+  if(vu){enterVesselOnly(vu);return}   // জাহাজ ব্যবহারকারী: Driver/Helper অংশ চালুই হয় না, সার্ভারে কোনো অনুরোধও যায় না
   init();showFillDate();updateRequiredMarks();
   // শুরুতেই পাসওয়ার্ড যাচাই: না থাকলে চাওয়া হয়; থাকলে সার্ভারে মিলিয়ে দেখা হয় (পাসওয়ার্ড বদলানো হলে আবার চাইবে)
   if(!getFormKey())showLogin();else fetch(SHEET_URL).catch(function(){});
@@ -2351,4 +2398,9 @@ body.vesselMode #fsHelperToDriver{display:none!important}
 @keyframes popBadge{from{transform:scale(0)}to{transform:scale(1)}}
 @media (prefers-reduced-motion:reduce){#popLayer .popRoad,#popLayer .popBob,#popLayer .popSpin,#popLayer .popSmoke circle{animation:none!important}}
 @media print{#popLayer{display:none!important}}
+</style>
+<style id="vessel-only-css">
+body.vesselOnly #fsDriver,body.vesselOnly #fsVessel,body.vesselOnly #fsHelperToDriver{display:none!important}
+#vesselUserChip{font:bold 13px Arial;background:#fff;border:1.5px solid #000;border-radius:999px;padding:6px 8px 6px 16px;color:#000}
+#vesselUserChip button{margin-left:6px;border:0;background:#000;color:#fff;border-radius:999px;padding:4px 12px;font-weight:bold;cursor:pointer}
 </style>
