@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset="utf-8"><title>UCIL Joining Form</title>
+<!doctype html><html><head><meta charset="utf-8"><style id="authGateCss">html.gate{background:#04132e}html.gate body>*:not(#loginOverlay){visibility:hidden!important}</style><script>try{if(!sessionStorage.getItem("ucilFormKey"))document.documentElement.classList.add("gate")}catch(e){document.documentElement.classList.add("gate")}</script><title>UCIL Joining Form</title>
 <style>
 @page{size:A4;margin:0}
 *{box-sizing:border-box}
@@ -1292,7 +1292,7 @@ window.onload=init;
 
 <script>
 // নিচের URL-টি Code.gs ডিপ্লয় করার পর পাওয়া নতুন Web App URL দিয়ে বদলে দিতে হবে
-const APP_VERSION="3.21";
+const APP_VERSION="3.23";
 const SHEET_URL="https://script.google.com/macros/s/AKfycbxIggc9iT9nZBkfFIXi8nvTOWc92To8Y7aQcEdm2cxNGdcewxTTr9-5oZ4eQ99ABAk2/exec";
 
 // ===== Form switch (Driver/Helper  <->  Vessels) + TEST MODE =====
@@ -1306,7 +1306,7 @@ function switchForm(w){
   document.getElementById("fsDriver").classList.toggle("on",!v);
   document.getElementById("fsVessel").classList.toggle("on",v);
   const fr=document.getElementById("vesselFrame");
-  if(v&&!fr.dataset.loaded){fr.dataset.loaded="1";fr.srcdoc=document.getElementById("vesselDoc").textContent.replace(/<\\\/script>/g,"<"+"/script>");fr.addEventListener("load",function(){fitVessel();mountFileCreateBy(fr.contentDocument)})}
+  if(v&&!fr.dataset.loaded){fr.dataset.loaded="1";fr.srcdoc=document.getElementById("vesselDoc").textContent.replace(/<\\\/script>/g,"<"+"/script>");fr.addEventListener("load",function(){try{const d=fr.contentDocument;const st=d.createElement("style");st.textContent=PAGE_FIX_CSS;d.head.appendChild(st)}catch(e){}fitVessel();mountFileCreateBy(fr.contentDocument)})}
   else if(v)fitVessel();
   window.scrollTo(0,0);
 }
@@ -1341,7 +1341,7 @@ window.fetch=function(u,o){
 };
 // ===== জাহাজ (Vessels) ব্যবহারকারী: পাসওয়ার্ডের জায়গায় ইমেইল =====
 // এই তালিকার ইমেইল লগইন বক্সে লিখলে শুধু Vessels Form খোলে; Driver/Helper ফর্ম খোলে না এবং
-// Driver/Helper-এর পাসওয়ার্ড (FORM_KEY) এই ব্যবহারকারীর কাছে কখনোই যায় না।
+// জাহাজ ব্যবহারকারীর ক্ষেত্রে Driver/Helper সার্ভারে কোনো অনুরোধই যায় না।
 // ↓↓↓ জাহাজ ফর্মের ব্যবহারকারীর ইমেইল এখানে লিখুন (একাধিক হলে কমা দিয়ে) ↓↓↓
 const VESSEL_USERS=["mohsin.islam@mgi.org"];
 function getVesselUser(){
@@ -1363,24 +1363,17 @@ function enterVesselOnly(email){
   }
   switchForm("vessel");
 }
-// ===== ইউজার আইডি লগইন (v3.20) =====
-// Driver/Helper ফর্ম: নিচের ৪টি User ID-র যেকোনোটি দিলে খোলে। (আগের একক পাসওয়ার্ড আর ব্যবহারকারীকে দিতে হয় না)
-// ID সঠিক হলে ব্যাকগ্রাউন্ডে FORM_KEY সার্ভারে যায় — সার্ভারের (Apps Script) পাসওয়ার্ড বদলালে শুধু এই FORM_KEY বদলাতে হবে।
-// ↓↓↓ নতুন ইউজার যোগ করতে এই তালিকায় "ID":"Name" যোগ করুন ↓↓↓
-const FORM_KEY="admin_ucil123";
-const ID_USERS={
-  "024371":"Md. Nazmul Hossain",
-  "079534":"Roni Sarder",
-  "092082":"Md. Liton Mondal",
-  "163432":"Md. Abdur Rahim"
-};
+// ===== ইউজার আইডি লগইন (v3.22) =====
+// Driver/Helper ফর্ম: অনুমোদিত User ID দিলে খোলে।
+// User ID যাচাই সম্পূর্ণ Google Apps Script (সার্ভার) করে — আইডির তালিকা বা পাসওয়ার্ড এই HTML ফাইলে নেই।
+// ইউজার যোগ/বাদ দিতে Apps Script-এর USERS তালিকা বদলান।
 function bnToEn(s){return String(s==null?"":s).replace(/[\u09E6-\u09EF]/g,function(d){return String(d.charCodeAt(0)-0x09E6)})}
-function getIdUser(){
-  try{const id=String(sessionStorage.getItem("ucilUserId")||"").trim();return ID_USERS[id]?id:""}catch(e){return ""}
-}
-function getIdUserName(){const id=getIdUser();return id?ID_USERS[id]:""}
+function getIdUser(){return getFormKey()}   // ঢোকা User ID (যাচাই সার্ভারে হয়েছে)
+function getIdUserName(){try{return String(sessionStorage.getItem("ucilUserName")||"")}catch(e){return ""}}
+function clearIdSession(){try{sessionStorage.removeItem("ucilFormKey");sessionStorage.removeItem("ucilUserName");sessionStorage.removeItem("ucilUserId")}catch(e){}}
 
 // ===== প্রিন্টে পেজের নিচে "File Create by: নাম" (স্ক্রিনে দেখা যায় না, শুধু প্রিন্টে আসে) =====
+const PAGE_FIX_CSS="@media screen{html body{background:transparent!important}.page{box-shadow:0 20px 60px rgba(0,0,0,.45)!important}}@media print{.page::after{display:none!important;content:none!important}}";
 const FCB_CSS="#fileCreateBy{display:none}@media print{#fileCreateBy{display:block!important;position:fixed;left:0;right:0;bottom:1.5mm;text-align:center;font:8.5px/1.2 Arial,sans-serif;color:#000!important;-webkit-text-fill-color:#000;z-index:2147483000;pointer-events:none}}";
 function mountIdChip(){
   try{
@@ -1389,7 +1382,7 @@ function mountIdChip(){
     const chip=document.createElement("span");chip.id="idUserChip";
     chip.innerHTML='👤 <b></b> <button type="button">Logout</button>';
     chip.querySelector("b").textContent=n;
-    chip.querySelector("button").onclick=function(){try{sessionStorage.removeItem("ucilUserId");sessionStorage.removeItem("ucilFormKey")}catch(e){}location.reload()};
+    chip.querySelector("button").onclick=function(){clearIdSession();location.reload()};
     fs.insertBefore(chip,fs.firstChild);
   }catch(e){}
 }
@@ -1421,7 +1414,7 @@ const LOGIN_CSS=`
 .lg-uc{font-size:64px;font-weight:800;line-height:1;letter-spacing:.5px}
 .lg-dept{margin-top:8px;font-size:21px;color:#7fd3ff}
 .lg-tag{margin-top:38px;font-size:25px;line-height:1.5;font-weight:500}
-.lg-city{margin-top:auto;display:block;width:calc(100% + 42px);max-width:none;margin-left:-6px}
+.lg-city{margin-top:auto;display:block;width:calc(100% + 84px);max-width:none;margin-left:-42px;margin-right:-42px}
 .lg-right{position:relative;padding:56px 7% 26px 8%;display:flex;flex-direction:column;overflow:hidden}
 .lg-wm{position:absolute;right:12px;bottom:70px;width:560px;height:297px;background:url(${WM_IMG}) no-repeat center/contain;opacity:.09;pointer-events:none;user-select:none}
 .lg-form{position:relative;z-index:1;max-width:520px}
@@ -1457,7 +1450,7 @@ const LOGIN_CSS=`
  .lg-card{grid-template-columns:1fr;min-height:0}
  .lg-left{padding:26px 24px 0;border-right:0;border-bottom:1px solid rgba(255,255,255,.14)}
  .lg-logo{width:120px;margin-bottom:16px}.lg-uc{font-size:46px}.lg-dept{font-size:18px}.lg-tag{margin-top:16px;font-size:19px}
- .lg-city{margin-top:14px;max-height:110px}
+ .lg-city{margin-top:14px;width:calc(100% + 48px);margin-left:-24px;margin-right:-24px}
  .lg-right{padding:28px 22px 22px}.lg-form h1{font-size:36px}.lg-wm{width:380px;height:202px;right:-60px}
 }
 @media print{#loginOverlay{display:none!important}}
@@ -1469,22 +1462,23 @@ const LOGIN_HTML=`
   <div class="lg-uc">UCIL</div>
   <div class="lg-dept">Transport Department</div>
   <div class="lg-tag">Safe Journey<br>Strong Operations</div>
-  <svg class="lg-city" viewBox="0 0 470 190" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="rgba(255,255,255,.38)" stroke-width="1.6">
+  <svg class="lg-city" viewBox="0 0 530 190" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="1.8">
    <g fill="rgba(255,255,255,.07)">
-    <rect x="20" y="38" width="22" height="22"/><rect x="14" y="60" width="54" height="108"/>
-    <rect x="96" y="108" width="22" height="16"/><rect x="82" y="124" width="68" height="44"/>
-    <rect x="164" y="30" width="34" height="138"/><rect x="172" y="14" width="3" height="16"/><rect x="187" y="14" width="3" height="16"/>
-    <rect x="220" y="104" width="20" height="16"/><rect x="208" y="120" width="76" height="48"/>
-    <rect x="300" y="46" width="34" height="122"/><rect x="304" y="30" width="3" height="16"/><rect x="326" y="30" width="3" height="16"/>
-    <rect x="352" y="88" width="56" height="80"/>
+    <rect x="33" y="32" width="28" height="23"/><rect x="18" y="55" width="60" height="120"/>
+    <rect x="110" y="72" width="25" height="20"/><rect x="90" y="92" width="78" height="83"/>
+    <rect x="185" y="20" width="37" height="155"/><rect x="196" y="6" width="3" height="14"/><rect x="209" y="6" width="3" height="14"/>
+    <rect x="263" y="62" width="29" height="20"/><rect x="247" y="82" width="88" height="93"/>
+    <rect x="350" y="44" width="53" height="131"/><rect x="366" y="28" width="3" height="16"/><rect x="387" y="28" width="3" height="16"/>
+    <rect x="420" y="102" width="62" height="73"/>
    </g>
-   <line x1="0" y1="168" x2="470" y2="168" stroke="rgba(255,255,255,.45)"/>
-   <g stroke="#fff" stroke-width="1.8">
-    <rect x="128" y="118" width="116" height="42" fill="#0b2a5c"/>
-    <line x1="140" y1="130" x2="232" y2="130"/><line x1="140" y1="138" x2="232" y2="138"/><line x1="140" y1="146" x2="232" y2="146"/>
-    <path d="M244 128h26l22 14v18h-48z" fill="#0b2a5c"/><path d="M262 132h16l10 8h-26z"/>
-    <circle cx="164" cy="162" r="10" fill="#0b2a5c"/><circle cx="164" cy="162" r="3.5"/>
-    <circle cx="268" cy="162" r="10" fill="#0b2a5c"/><circle cx="268" cy="162" r="3.5"/>
+   <line x1="0" y1="175" x2="530" y2="175" stroke="rgba(255,255,255,.5)"/>
+   <g stroke="#fff" stroke-width="2.2">
+    <line x1="118" y1="116" x2="168" y2="116" stroke-width="1.6"/><line x1="128" y1="128" x2="168" y2="128" stroke-width="1.6"/><line x1="138" y1="140" x2="168" y2="140" stroke-width="1.6"/>
+    <rect x="175" y="90" width="122" height="72" fill="#0b2a5c"/>
+    <line x1="187" y1="107" x2="285" y2="107" stroke-width="1.5"/><line x1="187" y1="120" x2="285" y2="120" stroke-width="1.5"/><line x1="187" y1="133" x2="285" y2="133" stroke-width="1.5"/>
+    <path d="M297 112H330L363 135V162H297Z" fill="#0b2a5c"/><path d="M305 120H335L350 134H305Z" stroke-width="1.8"/>
+    <circle cx="216" cy="162" r="13" fill="#0b2a5c"/><circle cx="216" cy="162" r="4"/>
+    <circle cx="333" cy="162" r="13" fill="#0b2a5c"/><circle cx="333" cy="162" r="4"/>
    </g>
   </svg>
  </div>
@@ -1508,7 +1502,9 @@ const LOGIN_HTML=`
   </div>
  </div>
 </div>`;
+function ungate(){document.documentElement.classList.remove("gate")}
 function showLogin(msg){
+  document.documentElement.classList.add("gate");   // লগইন ছাড়া ফর্ম কখনোই দেখা যাবে না
   let ov=document.getElementById("loginOverlay");
   if(!ov){
     const css=document.createElement("style");css.id="loginUiCss";css.textContent=LOGIN_CSS;document.head.appendChild(css);
@@ -1528,22 +1524,22 @@ function showLogin(msg){
       if(v.indexOf("@")>-1){
         const low=v.toLowerCase();
         if(VESSEL_USERS.map(function(x){return String(x).trim().toLowerCase()}).indexOf(low)>-1){
-          try{sessionStorage.setItem("ucilVesselUser",low);sessionStorage.removeItem("ucilFormKey");sessionStorage.removeItem("ucilUserId")}catch(e){}
+          clearIdSession();try{sessionStorage.setItem("ucilVesselUser",low)}catch(e){}
           location.reload();return;
         }
         msgEl.textContent="এই ইমেইলের অনুমতি নেই";return;
       }
       // ---- User ID: Driver/Helper ফর্ম ----
-      if(!ID_USERS[v]){msgEl.textContent="ভুল User ID — এই আইডির অনুমতি নেই";return}
+      if(!/^[0-9]{3,12}$/.test(v)){msgEl.textContent="ভুল User ID — শুধু সংখ্যা লিখুন";return}
       setBusy(true);
       try{
-        const r=await _origFetch(SHEET_URL+"?key="+encodeURIComponent(FORM_KEY));
+        const r=await _origFetch(SHEET_URL+"?key="+encodeURIComponent(v));
         const j=await r.json();
-        if(j&&j.result==="success"){
-          try{sessionStorage.setItem("ucilFormKey",FORM_KEY);sessionStorage.setItem("ucilUserId",v);sessionStorage.removeItem("ucilVesselUser")}catch(e){}
+        if(j&&j.result==="success"&&j.user){
+          try{sessionStorage.setItem("ucilFormKey",v);sessionStorage.setItem("ucilUserName",String(j.user));sessionStorage.removeItem("ucilVesselUser")}catch(e){}
           location.reload();return;
         }
-        msgEl.textContent=(j&&j.message)||"লগইন করা যায়নি";
+        msgEl.textContent=(j&&j.message)||"ভুল User ID — এই আইডির অনুমতি নেই";
       }catch(e){msgEl.textContent="সার্ভারে সংযোগ করা যায়নি"}
       setBusy(false);
     };
@@ -1551,9 +1547,12 @@ function showLogin(msg){
     inp.addEventListener("keydown",function(e){if(e.key==="Enter")go()});
   }
   if(msg)document.getElementById("loginMsg").textContent=msg;
-  try{sessionStorage.removeItem("ucilFormKey");sessionStorage.removeItem("ucilUserId")}catch(e){}
+  clearIdSession();
   setTimeout(function(){const k=document.getElementById("loginKey");if(k)k.focus()},50);
 }
+
+// পেজ লোড শেষ হওয়ার অপেক্ষা না করে সাথে সাথেই লগইন স্ক্রিন (ফর্ম একবারও ঝলকাবে না)
+if(!getFormKey()&&!getVesselUser())showLogin();
 
 // ===== নতুন ভার্সনের বার্তা (v3.13) — হোস্ট করা পেজে চলে, ফাইল থেকে খুললে বন্ধ =====
 function checkForUpdate(){
@@ -2379,11 +2378,18 @@ function parseDateStr(str){
 function handleTypedDate(inp,cb){const val=inp.value.trim();if(!val){delete inp.dataset.iso;if(cb)cb();return}const p=parseDateStr(val);if(p){inp.value=fmtDate(new Date(p.y,p.m,p.d));inp.dataset.iso=p.y+"-"+pad(p.m+1)+"-"+pad(p.d)}else{delete inp.dataset.iso}if(cb)cb()}
 window.onload=function(){
   const vu=getVesselUser();
-  if(vu){enterVesselOnly(vu);return}   // জাহাজ ব্যবহারকারী: Driver/Helper অংশ চালুই হয় না, সার্ভারে কোনো অনুরোধও যায় না
+  if(vu){enterVesselOnly(vu);ungate();return}   // জাহাজ ব্যবহারকারী: Driver/Helper অংশ চালুই হয় না, সার্ভারে কোনো অনুরোধও যায় না
   init();showFillDate();updateRequiredMarks();
   // শুরুতেই পাসওয়ার্ড যাচাই: না থাকলে চাওয়া হয়; থাকলে সার্ভারে মিলিয়ে দেখা হয় (পাসওয়ার্ড বদলানো হলে আবার চাইবে)
-  if(!getIdUser()||!getFormKey()){showLogin();return}
-  mountFileCreateBy();mountIdChip();fetch(SHEET_URL).catch(function(){});
+  if(!getFormKey()){showLogin();return}
+  ungate();mountFileCreateBy();mountIdChip();
+  // সার্ভার আইডি যাচাই করে নাম ফেরত দেয়; নাম সার্ভার থেকেই নেওয়া হয় (ভুল আইডি হলে wrapper লগইন স্ক্রিন দেখাবে)
+  fetch(SHEET_URL).then(function(r){return r.json()}).then(function(j){
+    if(j&&j.user&&j.user!==getIdUserName()){
+      try{sessionStorage.setItem("ucilUserName",String(j.user))}catch(e){}
+      mountFileCreateBy();const cb=document.querySelector("#idUserChip b");if(cb)cb.textContent=j.user;
+    }
+  }).catch(function(){});
 };
 </script></body></html>
 
@@ -2577,3 +2583,18 @@ function ltOwnerSync(){
   if(t)t.checked=(h.value==="Others");
 }
 </script>
+<style id="screen-bg-css">
+/* স্ক্রিনে: লগইন স্ক্রিনের মতো গাঢ় নীল গ্রিড-ব্যাকগ্রাউন্ড। প্রিন্ট সাদাই থাকে। */
+@media screen{
+  html{background:#04132e}
+  body{min-height:100vh;padding-bottom:40px!important;background-attachment:fixed!important;
+    background:linear-gradient(rgba(120,170,255,.09) 1px,transparent 1px) 0 0/56px 56px,
+               linear-gradient(90deg,rgba(120,170,255,.09) 1px,transparent 1px) 0 0/56px 56px,
+               radial-gradient(1200px 700px at 15% 8%,#1a4f9c 0%,rgba(26,79,156,0) 60%),
+               linear-gradient(160deg,#0b3270 0%,#071d45 45%,#04132e 100%) fixed!important}
+  .page{box-shadow:0 20px 60px rgba(0,0,0,.45)!important}
+  #vesselFrame{background:transparent}
+}
+/* প্রিন্টে পেজের মাথার রঙিন বর্ডার আসবে না */
+@media print{.page::after{display:none!important;content:none!important}}
+</style>
