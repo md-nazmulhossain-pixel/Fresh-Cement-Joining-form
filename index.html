@@ -1292,7 +1292,7 @@ window.onload=init;
 
 <script>
 // নিচের URL-টি Code.gs ডিপ্লয় করার পর পাওয়া নতুন Web App URL দিয়ে বদলে দিতে হবে
-const APP_VERSION="3.23";
+const APP_VERSION="3.24";
 const SHEET_URL="https://script.google.com/macros/s/AKfycbxIggc9iT9nZBkfFIXi8nvTOWc92To8Y7aQcEdm2cxNGdcewxTTr9-5oZ4eQ99ABAk2/exec";
 
 // ===== Form switch (Driver/Helper  <->  Vessels) + TEST MODE =====
@@ -2197,8 +2197,11 @@ const REQ_DRIVER=[["employeeName","Employee Name"],["designation","Designation"]
 // ২য় পাতার Driver Categories: নতুন ড্রাইভার এন্ট্রিতে বাধ্যতামূলক, তবে Loading Driver-এর জন্য নয়
 // (Temp থেকে কনভার্ট ও স্থায়ী CD এডিটে এই অস্থায়ী ক্যাটাগরি সেভ হয় না, তাই সেখানে বাধ্যতামূলক নয়)
 const REQ_TEMP_CAT=["tempDriverCategory","Driver Categories"];
+const REQ_VEHICLE=["vehicleNo","Vehicle No."];   // শুধু Helper-এর ক্ষেত্রে বাধ্যতামূলক
 function getReq(){
-  if(document.getElementById("designation").value!=="Driver")return REQ_OTHER;
+  const dsg=document.getElementById("designation").value;
+  if(dsg==="Helper")return REQ_OTHER.concat([REQ_VEHICLE]);
+  if(dsg!=="Driver")return REQ_OTHER;
   const sub=(document.getElementById("subDesignation")||{}).value||"";
   const needTempCat=(sub!=="Loading Driver")&&!editMode&&!convertMode;
   return needTempCat?REQ_DRIVER.concat([REQ_TEMP_CAT]):REQ_DRIVER;
@@ -2206,7 +2209,7 @@ function getReq(){
 // বাধ্যতামূলক ঘরের লেবেলের পাশে লাল * বসায় (Designation বদলালে আবার হিসাব হয়)
 function updateRequiredMarks(){
   const reqIds=getReq().map(r=>r[0]);
-  const all=REQ_DRIVER.concat(REQ_OTHER).concat([REQ_TEMP_CAT]).map(r=>r[0]);
+  const all=REQ_DRIVER.concat(REQ_OTHER).concat([REQ_TEMP_CAT,REQ_VEHICLE]).map(r=>r[0]);
   [...new Set(all)].forEach(id=>{
     const el=document.getElementById(id);if(!el)return;
     const f=el.closest(".f");let lb=f&&f.querySelector("label");
@@ -2218,7 +2221,7 @@ function updateRequiredMarks(){
 }
 function validateForm(){
   let miss=[],first=null;
-  [...new Set(REQ_DRIVER.concat(REQ_OTHER).concat([REQ_TEMP_CAT]).map(r=>r[0]))].forEach(id=>{const e0=document.getElementById(id);if(e0)e0.classList.remove("err")});
+  [...new Set(REQ_DRIVER.concat(REQ_OTHER).concat([REQ_TEMP_CAT,REQ_VEHICLE]).map(r=>r[0]))].forEach(id=>{const e0=document.getElementById(id);if(e0)e0.classList.remove("err")});
   getReq().forEach(r=>{let el=document.getElementById(r[0]);el.classList.remove("err");if(!String(el.value||"").trim()){miss.push(r[1]);el.classList.add("err");if(!first)first=el}});
   const mEl=document.getElementById("mobileNumber"),mob=mEl.value.replace(/\D/g,"");
   if(mob&&mob.length<11){miss.push("সঠিক Mobile Number");mEl.classList.add("err");if(!first)first=mEl}
