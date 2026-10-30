@@ -1267,6 +1267,7 @@ window.onload=init;
   <div class="c3 lbl">পদবীঃ</div><div class="c4 ln" id="trPosition"></div>
   <div class="c1 lbl">আই.ডি নংঃ</div><div class="c2 ln" id="trIdNo"></div>
   <div class="c3 lbl">লোকেশনঃ</div><div class="c4 ln" id="trLocation"></div>
+  <div class="c1 lbl">ড্রাইভার ক্যাটাগরিঃ</div><div class="c2 ln" id="trDriverCat"></div>
 </div>
 <div class="trSender"><div class="ln0"></div><div>প্রেরণকারীর স্বাক্ষর</div></div>
 <table class="trTable"><colgroup><col class="t1"><col class="t2"><col class="t3"><col class="t4"><col class="t5"></colgroup>
@@ -1646,6 +1647,7 @@ function updatePageVisibility(){
   if(p5)p5.style.display=finalStage?"":"none";
   document.body.classList.remove("printFinalOnly");
   document.body.classList.toggle("printAppraisalOnly",newStage);
+  document.body.classList.toggle("hideApprPrint",finalStage);
   updateRequiredMarks();
   document.body.classList.toggle("helperTheme",val==="Helper");
   const ttl=document.querySelector("#page1 .title");if(ttl)ttl.textContent=(val==="Helper")?"HELPER JOINING FORM":"EMPLOYEE JOINING FORM";
@@ -1761,6 +1763,8 @@ function syncPages(){
   setT("apTempCode",window.__tempCodeText||"");
   setT("trPosition",subjectText);
   setT("trIdNo",g("codeNo"));
+  {const _dcv=g("driverCategory"),_bn=s=>String(s).replace(/[0-9]/g,d=>"০১২৩৪৫৬৭৮৯"[d]);
+   setT("trDriverCat",!_dcv?"":(/^\d+$/.test(_dcv)?_bn(_dcv)+" ব্যাগ":((DRIVER_CAT_MAP[_dcv]&&DRIVER_CAT_MAP[_dcv].subject?DRIVER_CAT_MAP[_dcv].subject.replace(/\s*গাড়ির ড্রাইভার$|\s*ড্রাইভার$/,""):_dcv))))}
   setT("trVehicleNo",g("vehicleNo"));
   setT("trLocation",g("workingLocation"));
 }
@@ -2350,14 +2354,14 @@ async function printForm(){
   }finally{__busyAction=false}
   window.print();
 }
-// প্রিন্ট সিরিয়াল: ১ম, ৩য়, ৪র্থ, ৫ম, তারপর ২য় পাতা (শুধু প্রিন্টের সময়; স্ক্রিনে ক্রম অপরিবর্তিত)
-let __p2Moved=false;
+// প্রিন্ট সিরিয়াল (চূড়ান্ত ধাপ): ১ম, ৩য়, ৫ম, ৪র্থ পাতা — ২য় পাতা বাদ। শুধু প্রিন্টের সময় ক্রম বদলায়; স্ক্রিনে ক্রম অপরিবর্তিত।
+let __p45Moved=false;
 window.addEventListener("beforeprint",function(){
-  const p2=document.getElementById("pageAppraisal"),p3=document.getElementById("pageLetter"),p5=document.getElementById("pageTraining");
-  if(p2&&p3&&p5&&p2.style.display!=="none"&&p3.style.display!=="none"){p5.after(p2);__p2Moved=true}
+  const p3=document.getElementById("pageLetter"),p4=document.getElementById("pageDriverProfile"),p5=document.getElementById("pageTraining");
+  if(p3&&p4&&p5&&p4.style.display!=="none"&&p5.style.display!=="none"&&p3.nextElementSibling===p4&&p4.nextElementSibling===p5){p4.after(p5);p3.after(p5);__p45Moved=true}
 });
 window.addEventListener("afterprint",function(){
-  if(__p2Moved){const p2=document.getElementById("pageAppraisal"),p1=document.getElementById("page1");if(p2&&p1)p1.after(p2);__p2Moved=false}
+  if(__p45Moved){const p4=document.getElementById("pageDriverProfile"),p5=document.getElementById("pageTraining");if(p4&&p5)p4.after(p5);__p45Moved=false}
 });
 let pickerState=null;
 function closePicker(){if(pickerState){pickerState.el.remove();document.removeEventListener("click",outsideClick);pickerState=null}}
@@ -2600,4 +2604,20 @@ function ltOwnerSync(){
 }
 /* প্রিন্টে পেজের মাথার রঙিন বর্ডার আসবে না */
 @media print{.page::after{display:none!important;content:none!important}}
+</style>
+<style id="print-final-fix">
+@media print{
+  body.hideApprPrint #pageAppraisal{display:none !important}
+  body.hideApprPrint #pageDriverProfile{page-break-after:auto !important}
+  body.hideApprPrint #pageTraining{page-break-after:always !important}
+}
+</style>
+<style id="tr-cat-fit">
+#pageTraining .trInfo #trDriverCat{white-space:nowrap;overflow:hidden;text-overflow:clip;height:6mm;box-sizing:border-box;line-height:1.2}
+#pageTraining .trInfo .c1.lbl:nth-of-type(n){white-space:nowrap}
+#pageTraining .trSender{margin-top:2mm !important}
+</style>
+<style id="tr-sup-fit">
+#pageTraining .supWrap{height:38mm !important}
+#pageTraining .trFootImg{margin-bottom:5mm !important}
 </style>
