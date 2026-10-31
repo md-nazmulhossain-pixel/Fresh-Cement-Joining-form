@@ -816,7 +816,7 @@ function setPhotoPlaceholder(text){
   box.innerHTML=text?('<span style="font-weight:bold;color:#b45f06;font-size:12px">'+text+'</span>'):"Passport Size Photo";
 }
 async function updateCodeLogic(){
-  if(convertMode)return;
+  if(convertMode||editMode)return; // EDIT মোডে (পদোন্নতি/তথ্য আপডেট) কোড অপরিবর্তিত থাকবে
   const val=document.getElementById("designation").value;
   const codeEl=document.getElementById("codeNo");
   if(!val){codeEl.value="";setPhotoPlaceholder("");return}
